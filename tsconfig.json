@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "esnext",
-    "lib": ["es2018"],
+    "lib": ["es2018", "DOM"],
     "target": "es2018",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "outDir": "dist",
     "baseUrl": "src/",
     "sourceMap": true,
@@ -11,7 +12,8 @@
     "experimentalDecorators": true,
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false
+    "allowUnreachableCode": false,
+    "types": ["screeps", "node"]
   },
   "exclude": ["node_modules"]
 }
