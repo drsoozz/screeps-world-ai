@@ -1,16 +1,17 @@
 {
     "[javascript]": {
-        "editor.formatOnSave": false
+        "editor.formatOnSave": true
     },
     "[json]": {
         "editor.formatOnSave": true
     },
     "[typescript]": {
-        "editor.formatOnSave": false
+        "editor.formatOnSave": true
     },
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+        "source.fixAll.eslint"
+    ],
+    "editor.tabSize": 2,
     "editor.formatOnSave": true,
     "editor.renderWhitespace": "boundary",
     "files.encoding": "utf8",
@@ -23,6 +24,6 @@
         "node_modules/**": true,
         "typings/**": true
     },
-    "typescript.tsdk": "./node_modules/typescript/lib",
+    "js/ts.tsdk.path": "./node_modules/typescript/lib",
     "eslint.enable": true
 }
