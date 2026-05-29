@@ -1,3 +1,6 @@
+import { RoleType } from "creeps/roleType";
+import { ControllerLevel } from "./isValidControllerLevel";
+
 export {};
 
 declare global {
@@ -8,8 +11,10 @@ declare global {
   }
 
   interface CreepMemory {
-    role: string;
-    task: string | null;
-    homeRoom: string;
+    role: RoleType;
+    task: string | undefined;
+    homeRoom: Room["name"];
+    controllerLevelAtBirth: ControllerLevel;
+    numRenews: number
   }
 }
