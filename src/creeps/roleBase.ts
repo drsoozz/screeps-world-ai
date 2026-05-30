@@ -1,4 +1,4 @@
-import { DEFAULT_LONG_JOURNEY_PATH, DEFAULT_PATH_OPACITY, LIFE_RENEW_BOUNDS } from "consts";
+import { DEFAULT_REPAIR_BOUNDS, LIFE_RENEW_BOUNDS } from "consts";
 import { TaskType } from "./taskType";
 import { TaskActions } from "./TaskActions";
 
@@ -32,8 +32,10 @@ export class RoleBase {
     if (this.memory.task != TaskType.Renew) {
       const canRenew = this.memory.numRenews > 0;
       const shouldRenew = (this.creep.ticksToLive ?? 1500) <= LIFE_RENEW_BOUNDS.start;
-      if (canRenew && shouldRenew) {
+      const forcedRenew = this.creep.memory.forcedRenew;
+      if ((canRenew && shouldRenew) || forcedRenew) {
         this.memory.task = TaskType.Renew;
+        this.memory.forcedRenew = false;
       } else if (this.memory.waiting > 0) {
         this.memory.task = TaskType.Wait;
       } else if (this.memory.waiting <= 0 && this.memory.task === TaskType.Wait) {
@@ -92,17 +94,44 @@ export class RoleBase {
     }
   }
 
-  getDepositTargets(room: Room = this.creep.room): (StructureSpawn | StructureExtension | StructureContainer)[] {
-    let depositTargets = room.find(FIND_STRUCTURES, {
-      filter: s => {
-        return (
-          (s.structureType === STRUCTURE_CONTAINER ||
-            s.structureType === STRUCTURE_SPAWN ||
-            s.structureType === STRUCTURE_EXTENSION) &&
-          s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-        );
-      }
-    });
-    return depositTargets as (StructureSpawn | StructureExtension | StructureContainer)[];
+  getAllSafeDepositTargets(room: Room = this.creep.room) {
+    let safeDepositTargets = room
+      .find(FIND_STRUCTURES, {
+        filter: s => {
+          return (
+            (s.structureType === STRUCTURE_CONTAINER ||
+              s.structureType === STRUCTURE_SPAWN ||
+              s.structureType === STRUCTURE_EXTENSION) &&
+            s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+          );
+        }
+      })
+      .filter(s => {
+        const hostilesNearby = s.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
+        return hostilesNearby.length === 0;
+      });
+    return safeDepositTargets as (StructureSpawn | StructureExtension | StructureContainer)[];
+  }
+
+  getAllSafeWithdrawTargets(room: Room = this.creep.room) {
+    let safeDepositTargets = room
+      .find(FIND_STRUCTURES, {
+        filter: s => {
+          return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+        }
+      })
+      .filter(s => {
+        const hostilesNearby = s.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
+        return hostilesNearby.length === 0;
+      });
+    return safeDepositTargets as StructureContainer[];
+  }
+
+  getAllSafeConstructionSites() {
+    return this.taskActions.getAllSafeConstructionSites();
+  }
+
+  getAllSafeRepairTargets(threshholds: { start: number; stop: number } = DEFAULT_REPAIR_BOUNDS) {
+    return this.taskActions.getAllSafeRepairTargets(threshholds);
   }
 }

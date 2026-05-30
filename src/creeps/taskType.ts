@@ -6,7 +6,8 @@ export const TaskType = {
   Repair: "REPAIR",
   Upgrade: "UPGRADE",
   Renew: "RENEW",
-  Wait: "WAIT"
+  Wait: "WAIT",
+  Chart: "CHART"
 } as const;
 
 export type TaskType = (typeof TaskType)[keyof typeof TaskType];

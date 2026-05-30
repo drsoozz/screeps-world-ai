@@ -8,6 +8,9 @@ import {
 } from "consts";
 import { TaskType } from "./taskType";
 import { RoleType } from "./roleType";
+import { findSafeSources } from "utils/findSafeSources";
+import { ControllerLevel, isValidControllerLevel } from "types/isValidControllerLevel";
+import { findExplorationCandidates } from "utils/findExplorationCandidates";
 
 export class TaskActions {
   creep: Creep;
@@ -20,6 +23,90 @@ export class TaskActions {
     this.role = this.memory.role;
     this.task = this.memory.task;
   }
+
+  chart(): void {
+    const explorationCandidates = Memory.explorationCandidates;
+    if (explorationCandidates.rooms.length === 0) {
+      Memory.explorationCandidates = {
+        rooms: findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room),
+        index: 0
+      };
+    } else if (explorationCandidates.index >= explorationCandidates.rooms.length) {
+      Memory.explorationCandidates = {
+        rooms: findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room),
+        index: 0
+      };
+      this.memory.waiting = 1000;
+    }
+
+    const targetRoom = Game.rooms[explorationCandidates.rooms[explorationCandidates.index]];
+    if (!targetRoom) {
+      return;
+    }
+    const currentRoom = Game.rooms[this.creep.room.name];
+
+    let targetTimestamp = Memory.roomData[targetRoom.name]?.timestamp ?? 1;
+    let currentTimestamp = Memory.roomData[currentRoom.name]?.timestamp ?? 1;
+
+    const targetTimeSinceLastChart = Game.time - targetTimestamp;
+    const currentTimeSinceLastChart = Game.time - currentTimestamp;
+
+    if (currentTimeSinceLastChart > 100) {
+      Memory.roomData[currentRoom.name] = {
+        safeSources: findSafeSources(currentRoom).map(s => {
+          return {
+            id: s.id,
+            pos: {
+              x: s.pos.x,
+              y: s.pos.y,
+              roomName: s.pos.roomName
+            }
+          };
+        }),
+        controllerLevel: isValidControllerLevel(currentRoom.controller?.level)
+          ? (currentRoom.controller?.level as ControllerLevel)
+          : 0,
+        owner: currentRoom.controller?.owner?.username,
+        timestamp: Game.time
+      };
+    }
+
+    if (targetTimeSinceLastChart < 1000) {
+      explorationCandidates.index++;
+    } else if (this.creep.room != targetRoom) {
+      if (
+        this.creep.moveTo(new RoomPosition(25, 25, targetRoom.name), {
+          range: 23,
+          swampCost: 1,
+          plainCost: 1,
+          reusePath: DEFAULT_LONG_JOURNEY_PATH,
+          visualizePathStyle: { stroke: "#048243", opacity: DEFAULT_PATH_OPACITY }
+        }) === ERR_NO_PATH
+      ) {
+        explorationCandidates.index++;
+      }
+    } else {
+      Memory.roomData[currentRoom.name] = {
+        safeSources: findSafeSources(targetRoom).map(s => {
+          return {
+            id: s.id,
+            pos: {
+              x: s.pos.x,
+              y: s.pos.y,
+              roomName: s.pos.roomName
+            }
+          };
+        }),
+        controllerLevel: isValidControllerLevel(targetRoom.controller?.level)
+          ? (targetRoom.controller?.level as ControllerLevel)
+          : 0,
+        owner: targetRoom.controller?.owner?.username,
+        timestamp: Game.time
+      };
+      this.creep.memory.forcedRenew = true; // always renew between charting targets
+    }
+  }
+
   construct(): void {
     // attempt to get ConstructionSite from taskTargets
     // this may fail due to no creeps/owned structures being in the same room as the construction site

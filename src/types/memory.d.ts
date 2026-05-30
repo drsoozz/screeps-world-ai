@@ -9,6 +9,11 @@ declare global {
     initialized: boolean;
     generatePixels: boolean;
     wasteCollection: number;
+    explorationCandidates: {
+      rooms: Room["name"][];
+      index: number;
+    };
+    roomData: Partial<Record<Room["name"], RoomData>>;
   }
 
   interface CreepMemory {
@@ -18,11 +23,11 @@ declare global {
     parentSource: Id<Source>;
     controllerLevelAtBirth: ControllerLevel;
     numRenews: number;
+    forcedRenew: boolean;
     waiting: number;
     taskTargets: TaskTargetData;
   }
 }
-
 interface TaskTargetMap {
   [TaskType.Construct]: Structure | ConstructionSite;
   [TaskType.Deposit]: Structure;
@@ -33,6 +38,20 @@ interface TaskTargetMap {
   [TaskType.Wait]: StructureSpawn;
   [TaskType.Withdraw]: Structure;
 }
+
+export type RoomData = {
+  safeSources: {
+    id: Id<Source>;
+    pos: {
+      x: number;
+      y: number;
+      roomName: Room["name"];
+    };
+  }[];
+  controllerLevel: ControllerLevel;
+  owner: Owner["username"] | undefined;
+  timestamp: number;
+};
 
 export type TaskTargetData = {
   [T in keyof TaskTargetMap]?: {

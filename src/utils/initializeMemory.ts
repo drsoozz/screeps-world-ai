@@ -5,5 +5,9 @@ export function initializeMemory(): void {
     Memory.initialized = true;
     Memory.generatePixels = true;
     Memory.wasteCollection = 0;
+    Memory.explorationCandidates = {
+      rooms: [],
+      index: 0
+    };
   }
 }

@@ -14,7 +14,7 @@ export type RoleBodies = Record<
 export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
   1: {
     [RoleType.Harvester]: {
-      setBody: [CARRY, MOVE, WORK],
+      setBody: [CARRY, MOVE, WORK, WORK],
       fillBody: WORK
     },
     [RoleType.Upgrader]: {

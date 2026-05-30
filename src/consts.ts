@@ -15,15 +15,15 @@ export const DEFAULT_REPAIR_BOUNDS = {
   stop: 0.95
 };
 export const NUM_RENEWS: Record<ControllerLevel, number> = {
-  0: 3,
-  1: 5,
-  2: 7,
-  3: 9,
-  4: 11,
+  0: 1,
+  1: 3,
+  2: 5,
+  3: 7,
+  4: 10,
   5: 13,
-  6: 15,
-  7: 17,
-  8: 19
+  6: 16,
+  7: 20,
+  8: 25
 };
 
 export const DEFAULT_PATH_OPACITY = 0.75;

@@ -66,6 +66,7 @@ function _planCreepBody(
     return undefined;
   }
   const body = [...bodyData.setBody];
+  let fillBody = bodyData.fillBody ?? undefined;
 
   const activeEnergyStores = spawn.room.find(FIND_MY_STRUCTURES, {
     filter: s => {
@@ -80,7 +81,6 @@ function _planCreepBody(
   }
 
   let energyCost = _.sum(body, bp => BODYPART_COST[bp]);
-
   if (energyCost > energyMax) {
     console.log(
       `  > Not enough energy storage to create this creep's basic body plan (${energyMax}/${energyCost}). BODY PLAN: ${body}`
@@ -94,11 +94,7 @@ function _planCreepBody(
       "  > There are too few harvester screeps, and an emergency was declared. " +
         "This screep is intentionally made cheaper than normal."
     );
-  } else {
-    let fillBody = bodyData.fillBody ?? undefined;
-    if (!fillBody) {
-      return body;
-    }
+  } else if (fillBody) {
     fillBody = Array.isArray(fillBody) ? fillBody : [fillBody];
 
     let bi = 0;
@@ -179,6 +175,7 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
     parentSource: parentSourceId,
     controllerLevelAtBirth: cLevel,
     numRenews: numRenews,
+    forcedRenew: false,
     waiting: 0,
     taskTargets: taskTargets
   };
@@ -200,6 +197,9 @@ function _getParentSource(room: Room, role: RoleType): Id<Source> {
   }
 
   const sourceCount: Record<Source["id"], number> = {};
+  for (const sourceId of safeSources) {
+    sourceCount[sourceId] = 0;
+  }
   for (const creep of Object.values(Game.creeps)) {
     if (roleCondition && creep.memory.role != role) {
       continue;
