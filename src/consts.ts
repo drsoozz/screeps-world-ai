@@ -7,12 +7,12 @@ export const EXTENSION_COORD_LIMITS = {
   max: ROOM_SIZE - 5
 };
 export const LIFE_RENEW_BOUNDS = {
-  min: 250,
-  max: 1400
+  start: 250,
+  stop: 1400
 };
 export const DEFAULT_REPAIR_BOUNDS = {
-  min: 0.7,
-  max: 0.95
+  start: 0.7,
+  stop: 0.95
 };
 export const NUM_RENEWS: Record<ControllerLevel, number> = {
   0: 3,
@@ -26,7 +26,7 @@ export const NUM_RENEWS: Record<ControllerLevel, number> = {
   8: 19
 };
 
-export const DEFAULT_OPACITY = 0.75;
+export const DEFAULT_PATH_OPACITY = 0.75;
 export const DEFAULT_EXPLORATION_RANGE = 4;
 export const DEFAULT_EXPLOITATION_RANGE = 3;
 export const DEFAULT_REUSE_PATH = 10;
@@ -45,3 +45,5 @@ export const HARVESTERS_PER_SOURCE: Record<ControllerLevel, number> = {
 };
 
 export const ROLE_PRIORITY: RoleType[] = [...Object.values(RoleType)];
+
+export const TASK_TARGET_AGE_LIMIT = 150;

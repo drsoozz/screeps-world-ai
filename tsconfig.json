@@ -6,6 +6,7 @@
     "target": "es2018",
     "moduleResolution": "node",
     "outDir": "dist",
+    "rootDir": "src/",
     "baseUrl": "src/",
     "sourceMap": true,
     "strict": true,
