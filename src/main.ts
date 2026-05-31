@@ -4,6 +4,7 @@ import { generatePixels } from "utils/generatePixels";
 import { initializeMemory } from "utils/initializeMemory";
 import { planNextCreep } from "planning/planNextCreep";
 import { RoleMap } from "creeps/roleMap";
+import { planNextStructure } from "planning/planNextStructure";
 
 declare global {}
 // Syntax for adding properties to `global` (ex "global.log")
@@ -39,5 +40,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
     rooms.add(creep.room);
     const roleClass = RoleMap[creep.memory.role];
     new roleClass(creep).run();
+  }
+
+  for (const room of rooms) {
+    planNextStructure(room);
   }
 });

@@ -245,13 +245,13 @@ export class TaskActions {
         this.creep.moveTo(finalTarget, {
           range: 1,
           reusePath: DEFAULT_LONG_JOURNEY_PATH,
-          visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
+          visualizePathStyle: { stroke: "#1fff3d", opacity: DEFAULT_PATH_OPACITY }
         });
       } else {
         this.creep.moveTo(finalTarget, {
           range: 1,
           reusePath: DEFAULT_REUSE_PATH,
-          visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
+          visualizePathStyle: { stroke: "#1fff3d", opacity: DEFAULT_PATH_OPACITY }
         });
       }
     }
@@ -500,13 +500,13 @@ export class TaskActions {
         this.creep.moveTo(finalTarget, {
           range: 1,
           reusePath: DEFAULT_LONG_JOURNEY_PATH,
-          visualizePathStyle: { stroke: "#1f6dff", opacity: DEFAULT_PATH_OPACITY }
+          visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
         });
       } else {
         this.creep.moveTo(finalTarget, {
           range: 1,
           reusePath: DEFAULT_REUSE_PATH,
-          visualizePathStyle: { stroke: "#1f6dff", opacity: DEFAULT_PATH_OPACITY }
+          visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
         });
       }
     }
