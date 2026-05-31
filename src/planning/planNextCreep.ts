@@ -1,16 +1,16 @@
 import { getRoleDist } from "creeps/roleDistribution";
 import { RoleType } from "creeps/roleType";
 import { NUM_RENEWS, ROLE_PRIORITY } from "consts";
-import { ControllerLevel } from "types/isValidControllerLevel";
+import { ControllerLevel } from "types/ControllerLevel";
 import { RoleBody, ScreepBody } from "creeps/roleBody";
-import { isValidControllerLevel } from "types/isValidControllerLevel";
+import { isControllerLevel } from "types/ControllerLevel";
 import { findSafeSources } from "utils/findSafeSources";
 import { TaskType } from "creeps/taskType";
 import { TaskTargetData } from "types/memory";
 
 export function planNextCreep(room: Room): void {
   const cLevel = room.controller?.level;
-  if (cLevel === 0 || !isValidControllerLevel(cLevel)) {
+  if (cLevel === 0 || !isControllerLevel(cLevel)) {
     return;
   }
   const creepsNeeded = getRoleDist(room, room.controller?.level);

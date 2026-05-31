@@ -1,6 +1,6 @@
 import { HARVESTERS_PER_SOURCE } from "consts";
 import { RoleType } from "creeps/roleType";
-import { ControllerLevel, isValidControllerLevel } from "types/isValidControllerLevel";
+import { ControllerLevel, isControllerLevel } from "types/ControllerLevel";
 import { findSafeSources } from "utils/findSafeSources";
 
 type RoleCounts = Record<RoleType, number>;
@@ -42,7 +42,7 @@ export function getRoleDist(room: Room, cLevel?: number): RoleCounts {
   if (cLevel === undefined) {
     cLevel = room.controller?.level;
   }
-  if (!isValidControllerLevel(cLevel)) {
+  if (!isControllerLevel(cLevel)) {
     return _defaultRoleDist;
   }
 

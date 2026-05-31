@@ -1,4 +1,4 @@
-import { ControllerLevel } from "types/isValidControllerLevel";
+import { ControllerLevel } from "types/ControllerLevel";
 import { RoleType } from "./roleType";
 
 export type ScreepBodyPart = (typeof BODYPARTS_ALL)[number];

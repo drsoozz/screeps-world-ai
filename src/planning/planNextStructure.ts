@@ -2,6 +2,9 @@ import { spiralPath } from "utils/spiralPath";
 import { BUILD_PRIORITY } from "./structures/BUILD_PRIORITY";
 import { getNumBlockedSquares } from "utils/getNumBlockedSquares";
 import { findSafeSources } from "utils/findSafeSources";
+import { getRoadPlanCoords } from "./structures/getRoadPlanCoords";
+import { hasStructureOrSite } from "utils/hasStructureOrConstructionSite";
+import { getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
 
 export function planNextStructure(room: Room): void {
   // never build on CL1 because you don't want a backlog of construction sites before extensions can be built
@@ -32,7 +35,8 @@ export function planNextStructure(room: Room): void {
       case STRUCTURE_ROAD:
       case STRUCTURE_WALL:
       case STRUCTURE_RAMPART: {
-        // TODO
+        // could be better
+        needToBuild = true;
         break;
       }
     }
@@ -51,6 +55,10 @@ export function planNextStructure(room: Room): void {
       }
       case STRUCTURE_CONTAINER: {
         return _planContainer(room);
+      }
+      case STRUCTURE_ROAD: {
+        _planRoad(room);
+        break;
       }
       default: {
         break;
@@ -163,6 +171,27 @@ function _planContainer(room: Room) {
   }
   creatingStructureMessage(STRUCTURE_CONTAINER);
   const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
+}
+
+function _planRoad(room: Room) {
+  let roadPlan =
+    Memory.structurePlanning.roads?.[room.name] ??
+    (Memory.structurePlanning.roads[room.name] = { coords: [], index: 0 });
+
+  if (roadPlan.coords.length === 0 || roadPlan.index >= roadPlan.coords.length) {
+    roadPlan.coords = getRoadPlanCoords(room);
+    roadPlan.index = 0;
+    console.log(`Road data for structure planning was generated for ${room.name}.`);
+  }
+
+  const pos = getRehydratedRoomPosition(roadPlan.coords[roadPlan.index]);
+
+  roadPlan.index++;
+
+  if (!hasStructureOrSite(pos)) {
+    creatingStructureMessage(STRUCTURE_ROAD);
+    pos.createConstructionSite(STRUCTURE_ROAD);
+  }
 }
 
 function creatingStructureMessage(structName: string): void {

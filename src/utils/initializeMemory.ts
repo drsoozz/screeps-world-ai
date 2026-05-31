@@ -9,5 +9,8 @@ export function initializeMemory(): void {
       rooms: [],
       index: 0
     };
+    Memory.structurePlanning = {
+      roads: {}
+    };
   }
 }

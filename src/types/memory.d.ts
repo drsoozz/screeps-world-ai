@@ -1,6 +1,7 @@
 import { RoleType } from "creeps/roleType";
 import { TaskType } from "creeps/taskType";
-import { ControllerLevel } from "./isValidControllerLevel";
+import { ControllerLevel } from "./ControllerLevel";
+import { DehydratedRoomPosition } from "./DehydratedRoomPosition";
 
 export {};
 
@@ -14,6 +15,7 @@ declare global {
       index: number;
     };
     roomData: Partial<Record<Room["name"], RoomData>>;
+    structurePlanning: structurePlanningData;
   }
 
   interface CreepMemory {
@@ -28,6 +30,18 @@ declare global {
     taskTargets: TaskTargetData;
   }
 }
+
+export type structurePlanningData = {
+  roads: Partial<
+    Record<
+      Room["name"],
+      {
+        coords: DehydratedRoomPosition[];
+        index: number;
+      }
+    >
+  >;
+};
 interface TaskTargetMap {
   [TaskType.Construct]: Structure | ConstructionSite;
   [TaskType.Deposit]: Structure;
@@ -42,11 +56,7 @@ interface TaskTargetMap {
 export type RoomData = {
   safeSources: {
     id: Id<Source>;
-    pos: {
-      x: number;
-      y: number;
-      roomName: Room["name"];
-    };
+    pos: DehydratedRoomPosition;
   }[];
   controllerLevel: ControllerLevel;
   owner: Owner["username"] | undefined;
@@ -56,11 +66,7 @@ export type RoomData = {
 export type TaskTargetData = {
   [T in keyof TaskTargetMap]?: {
     id: Id<TaskTargetMap[T]>;
-    pos: {
-      x: number;
-      y: number;
-      roomName: Room["name"];
-    };
+    pos: DehydratedRoomPosition;
     timestamp: number;
   };
 };

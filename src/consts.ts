@@ -1,4 +1,4 @@
-import { ControllerLevel } from "types/isValidControllerLevel";
+import { ControllerLevel } from "types/ControllerLevel";
 import { RoleType } from "creeps/roleType";
 
 export const ROOM_SIZE = 50;

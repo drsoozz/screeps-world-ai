@@ -9,7 +9,7 @@ import {
 import { TaskType } from "./taskType";
 import { RoleType } from "./roleType";
 import { findSafeSources } from "utils/findSafeSources";
-import { ControllerLevel, isValidControllerLevel } from "types/isValidControllerLevel";
+import { ControllerLevel, isControllerLevel } from "types/ControllerLevel";
 import { findExplorationCandidates } from "utils/findExplorationCandidates";
 
 export class TaskActions {
@@ -63,7 +63,7 @@ export class TaskActions {
             }
           };
         }),
-        controllerLevel: isValidControllerLevel(currentRoom.controller?.level)
+        controllerLevel: isControllerLevel(currentRoom.controller?.level)
           ? (currentRoom.controller?.level as ControllerLevel)
           : 0,
         owner: currentRoom.controller?.owner?.username,
@@ -97,7 +97,7 @@ export class TaskActions {
             }
           };
         }),
-        controllerLevel: isValidControllerLevel(targetRoom.controller?.level)
+        controllerLevel: isControllerLevel(targetRoom.controller?.level)
           ? (targetRoom.controller?.level as ControllerLevel)
           : 0,
         owner: targetRoom.controller?.owner?.username,
