@@ -182,7 +182,7 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
 
   return creepMemory;
 }
-function _getParentSource(room: Room, role: RoleType): Id<Source> {
+function _getParentSource(room: Room, role?: RoleType): Id<Source> {
   const safeSources = findSafeSources(room).map(s => s.id);
   let roleCondition: boolean;
   switch (role) {
@@ -196,7 +196,7 @@ function _getParentSource(room: Room, role: RoleType): Id<Source> {
     }
   }
 
-  const sourceCount: Record<Source["id"], number> = {};
+  const sourceCount: Record<Id<Source>, number> = {};
   for (const sourceId of safeSources) {
     sourceCount[sourceId] = 0;
   }

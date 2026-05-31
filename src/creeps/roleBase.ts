@@ -13,7 +13,9 @@ export class RoleBase {
   }
 
   run(): void {
-    this._findTask();
+    if (this.memory.task !== TaskType.Renew && this.memory.task !== TaskType.Wait) {
+      this._findTask();
+    }
     this._findGeneralTask();
     this._doTask();
     this._doGeneralTask();
@@ -56,37 +58,32 @@ export class RoleBase {
 
   _doGeneralTask(): void {
     switch (this.memory.task) {
+      case TaskType.Chart: {
+        return this.taskActions.chart();
+      }
       case TaskType.Construct: {
-        this.taskActions.construct();
-        break;
+        return this.taskActions.construct();
       }
       case TaskType.Deposit: {
-        this.taskActions.deposit();
-        break;
+        return this.taskActions.deposit();
       }
       case TaskType.Harvest: {
-        this.taskActions.harvest();
-        break;
+        return this.taskActions.harvest();
       }
       case TaskType.Renew: {
-        this.taskActions.renew();
-        break;
+        return this.taskActions.renew();
       }
       case TaskType.Repair: {
-        this.taskActions.repair();
-        break;
+        return this.taskActions.repair();
       }
       case TaskType.Upgrade: {
-        this.taskActions.upgrade();
-        break;
+        return this.taskActions.upgrade();
       }
       case TaskType.Wait: {
-        this.taskActions.wait();
-        break;
+        return this.taskActions.wait();
       }
       case TaskType.Withdraw: {
-        this.taskActions.withdraw();
-        break;
+        return this.taskActions.withdraw();
       }
       default: {
         return;
