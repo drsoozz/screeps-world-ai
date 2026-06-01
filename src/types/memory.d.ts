@@ -43,6 +43,7 @@ export type structurePlanningData = {
   >;
 };
 interface TaskTargetMap {
+  [TaskType.Chart]: StructureController;
   [TaskType.Construct]: Structure | ConstructionSite;
   [TaskType.Deposit]: Structure;
   [TaskType.Harvest]: Source;

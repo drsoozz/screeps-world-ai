@@ -117,8 +117,10 @@ function _planExtension(spawn: StructureSpawn | undefined) {
     }
   }
 
-  creatingStructureMessage(STRUCTURE_EXTENSION);
   const result = pos.createConstructionSite(STRUCTURE_EXTENSION);
+  if (result === 0) {
+    creatingStructureMessage(STRUCTURE_EXTENSION);
+  }
 }
 
 function _planContainer(room: Room) {
@@ -169,8 +171,10 @@ function _planContainer(room: Room) {
     }
     break;
   }
-  creatingStructureMessage(STRUCTURE_CONTAINER);
   const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
+  if (result === 0) {
+    creatingStructureMessage(STRUCTURE_CONTAINER);
+  }
 }
 
 function _planRoad(room: Room) {
@@ -189,8 +193,10 @@ function _planRoad(room: Room) {
   roadPlan.index++;
 
   if (!hasStructureOrSite(pos)) {
-    creatingStructureMessage(STRUCTURE_ROAD);
-    pos.createConstructionSite(STRUCTURE_ROAD);
+    const result = pos.createConstructionSite(STRUCTURE_ROAD);
+    if (result === 0) {
+      creatingStructureMessage(STRUCTURE_ROAD);
+    }
   }
 }
 

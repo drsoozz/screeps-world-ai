@@ -1,15 +1,19 @@
 import { DEFAULT_REPAIR_BOUNDS, LIFE_RENEW_BOUNDS } from "consts";
 import { TaskType } from "./taskType";
 import { TaskActions } from "./TaskActions";
+import { TaskTargetData } from "types/memory";
 
 export class RoleBase {
   creep: Creep;
   memory: CreepMemory;
   taskActions: TaskActions;
+  taskTargets: TaskTargetData;
+
   constructor(creep: Creep) {
     this.creep = creep;
     this.memory = creep.memory;
     this.taskActions = new TaskActions(creep);
+    this.taskTargets = this.taskActions.taskTargets;
   }
 
   run(): void {

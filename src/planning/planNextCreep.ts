@@ -92,7 +92,7 @@ function _planCreepBody(
   if (emergency) {
     console.log(
       "  > There are too few harvester screeps, and an emergency was declared. " +
-        "This screep is intentionally made cheaper than normal."
+        "This creep is intentionally made cheaper than normal."
     );
   } else if (fillBody) {
     fillBody = Array.isArray(fillBody) ? fillBody : [fillBody];

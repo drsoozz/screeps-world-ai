@@ -11,17 +11,22 @@ import { RoleType } from "./roleType";
 import { findSafeSources } from "utils/findSafeSources";
 import { ControllerLevel, isControllerLevel } from "types/ControllerLevel";
 import { findExplorationCandidates } from "utils/findExplorationCandidates";
+import { getDehydratedRoomPosition, getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
+import { TaskTargetData } from "types/memory";
 
 export class TaskActions {
   creep: Creep;
   memory: CreepMemory;
   role: RoleType;
   task?: TaskType;
+  taskTargets: TaskTargetData;
+
   constructor(creep: Creep) {
     this.creep = creep;
     this.memory = creep.memory;
     this.role = this.memory.role;
     this.task = this.memory.task;
+    this.taskTargets = this.memory.taskTargets;
   }
 
   chart(): void {
@@ -112,12 +117,12 @@ export class TaskActions {
     // this may fail due to no creeps/owned structures being in the same room as the construction site
 
     let finalTarget: ConstructionSite | undefined = undefined;
-    let finalTargetData = this.memory.taskTargets[TaskType.Construct];
+    let finalTargetData = this.memory.taskTargets?.[TaskType.Construct];
 
-    if (!finalTargetData?.pos.x || !finalTargetData.pos.y || !finalTargetData.pos.roomName) {
+    if (!finalTargetData?.pos.x || !finalTargetData?.pos.y || !finalTargetData?.pos.roomName) {
       delete this.memory.taskTargets[TaskType.Construct];
     } else if (this.creep.room.name != finalTargetData.pos.roomName) {
-      this.creep.moveTo(new RoomPosition(finalTargetData.pos.x, finalTargetData.pos.y, finalTargetData.pos.roomName), {
+      this.creep.moveTo(getRehydratedRoomPosition(finalTargetData.pos), {
         range: 3,
         reusePath: DEFAULT_LONG_JOURNEY_PATH,
         visualizePathStyle: { stroke: "#FE5000", opacity: DEFAULT_PATH_OPACITY }
@@ -157,13 +162,13 @@ export class TaskActions {
 
   deposit(): void {
     let finalTarget: HasStore | undefined = undefined;
-    let taskTargetInfo = this.memory.taskTargets[TaskType.Construct];
+    let finalTargetData = this.memory.taskTargets?.[TaskType.Deposit];
 
     /**
      * check that the current task target is still a valid target for depositing energy
      */
-    if (taskTargetInfo && Game.time - taskTargetInfo.timestamp < TASK_TARGET_AGE_LIMIT) {
-      const taskTarget = Game.getObjectById(taskTargetInfo.id);
+    if (finalTargetData && Game.time - finalTargetData.timestamp < TASK_TARGET_AGE_LIMIT) {
+      const taskTarget = Game.getObjectById(finalTargetData.id);
       if (hasStore(taskTarget) && taskTarget.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
         finalTarget = taskTarget;
       }
@@ -199,13 +204,9 @@ export class TaskActions {
           return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
         });
         finalTarget = freeSpawnsAndExtensions[0];
-        this.memory.taskTargets[TaskType.Deposit] = {
+        finalTargetData = {
           id: finalTarget.id,
-          pos: {
-            x: finalTarget.pos.x,
-            y: finalTarget.pos.y,
-            roomName: finalTarget.room.name
-          },
+          pos: getDehydratedRoomPosition(finalTarget.pos),
           timestamp: Game.time
         };
       } else {
@@ -219,13 +220,9 @@ export class TaskActions {
             return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
           });
           finalTarget = freeContainers[0];
-          this.memory.taskTargets[TaskType.Deposit] = {
+          finalTargetData = {
             id: finalTarget.id,
-            pos: {
-              x: finalTarget.pos.x,
-              y: finalTarget.pos.y,
-              roomName: finalTarget.room.name
-            },
+            pos: getDehydratedRoomPosition(finalTarget.pos),
             timestamp: Game.time
           };
         } else {
@@ -258,13 +255,12 @@ export class TaskActions {
   }
 
   harvest(): void {
-    const finalTargetData = this.memory.taskTargets[TaskType.Harvest];
-    if (!finalTargetData?.pos.x || !finalTargetData.pos.y || !finalTargetData.pos.roomName) {
+    const finalTargetData = this.memory.taskTargets?.[TaskType.Harvest];
+    if (!finalTargetData?.pos.x || !finalTargetData?.pos.y || !finalTargetData?.pos.roomName) {
       return;
     }
     const finalTarget = Game.getObjectById(finalTargetData?.id ?? this.memory.parentSource);
-    const finalTargetPos =
-      finalTarget?.pos ?? new RoomPosition(finalTargetData.pos.x, finalTargetData.pos.y, finalTargetData.pos.roomName);
+    const finalTargetPos = finalTarget?.pos ?? getRehydratedRoomPosition(finalTargetData.pos);
 
     if (this.creep.room.name != finalTargetPos.roomName) {
       this.creep.moveTo(finalTargetPos, {
@@ -356,12 +352,12 @@ export class TaskActions {
 
   repair(threshholds: { start: number; stop: number } = DEFAULT_REPAIR_BOUNDS): void {
     let finalTarget: Structure | undefined = undefined;
-    let finalTargetData = this.memory.taskTargets[TaskType.Repair];
+    let finalTargetData = this.memory.taskTargets?.[TaskType.Repair];
 
-    if (!finalTargetData?.pos.x || !finalTargetData.pos.y || !finalTargetData.pos.roomName) {
+    if (!finalTargetData?.pos.x || !finalTargetData?.pos.y || !finalTargetData?.pos.roomName) {
       delete this.memory.taskTargets[TaskType.Repair];
     } else if (this.creep.room.name != finalTargetData.pos.roomName) {
-      this.creep.moveTo(new RoomPosition(finalTargetData.pos.x, finalTargetData.pos.y, finalTargetData.pos.roomName), {
+      this.creep.moveTo(getRehydratedRoomPosition(finalTargetData.pos), {
         range: 3,
         reusePath: DEFAULT_LONG_JOURNEY_PATH,
         visualizePathStyle: { stroke: "#FE5000", opacity: DEFAULT_PATH_OPACITY }
@@ -381,16 +377,12 @@ export class TaskActions {
         potentialTargets.sort((a, b) => {
           return a.hits / a.hitsMax - b.hits / b.hitsMax;
         });
-        this.memory.taskTargets[TaskType.Repair] = {
-          id: potentialTargets[0].id,
-          pos: {
-            x: potentialTargets[0].pos.x,
-            y: potentialTargets[0].pos.y,
-            roomName: potentialTargets[0].pos.roomName
-          },
+        finalTarget = potentialTargets[0];
+        finalTargetData = {
+          id: finalTarget.id,
+          pos: getDehydratedRoomPosition(finalTarget.pos),
           timestamp: Game.time
         };
-        finalTarget = potentialTargets[0];
       }
     }
 
