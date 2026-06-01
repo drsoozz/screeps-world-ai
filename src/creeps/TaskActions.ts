@@ -30,14 +30,17 @@ export class TaskActions {
   }
 
   chart(): void {
-    const explorationCandidates = Memory.explorationCandidates;
+    let explorationCandidates = this.memory?.explorationCandidates;
+    if (!explorationCandidates) {
+      explorationCandidates = this.memory.explorationCandidates = { rooms: [], index: 0 };
+    }
     if (explorationCandidates.rooms.length === 0) {
-      Memory.explorationCandidates = {
+      explorationCandidates = {
         rooms: findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room),
         index: 0
       };
     } else if (explorationCandidates.index >= explorationCandidates.rooms.length) {
-      Memory.explorationCandidates = {
+      explorationCandidates = {
         rooms: findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room),
         index: 0
       };

@@ -2,6 +2,7 @@ import { RoleType } from "creeps/roleType";
 import { TaskType } from "creeps/taskType";
 import { ControllerLevel } from "./ControllerLevel";
 import { DehydratedRoomPosition } from "./DehydratedRoomPosition";
+import { EnvironmentType } from "utils/initializeEnvironment";
 
 export {};
 
@@ -10,13 +11,10 @@ declare global {
     initialized: boolean;
     generatePixels: boolean;
     wasteCollection: number;
-    explorationCandidates: {
-      rooms: Room["name"][];
-      index: number;
-    };
     roomData: Partial<Record<Room["name"], RoomData>>;
     structurePlanning: Partial<Record<Room["name"], structurePlanningData>>;
     creepPlanning: Partial<Record<Room["name"], { counter: number }>>;
+    environment: EnvironmentType;
   }
 
   interface CreepMemory {
@@ -29,6 +27,10 @@ declare global {
     forcedRenew: boolean;
     waiting: number;
     taskTargets: TaskTargetData;
+    explorationCandidates?: {
+      rooms: Room["name"][];
+      index: number;
+    };
   }
 }
 
