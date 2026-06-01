@@ -41,11 +41,11 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
     },
     [RoleType.Upgrader]: {
       setBody: [CARRY, CARRY, MOVE, WORK],
-      fillBody: WORK
+      fillBody: CARRY
     },
     [RoleType.Constructor]: {
       setBody: [CARRY, CARRY, MOVE, MOVE, WORK],
-      fillBody: WORK
+      fillBody: CARRY
     },
     [RoleType.Repairer]: {
       setBody: [CARRY, MOVE, WORK, WORK],

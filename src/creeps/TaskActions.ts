@@ -533,6 +533,12 @@ export class TaskActions {
     });
     return structs;
   }
+
+  isTaskTargetValid(task: TaskType, timeLimit: number = TASK_TARGET_AGE_LIMIT): boolean {
+    const taskData = this.taskTargets?.[task];
+    const tooOld = Game.time - (taskData?.timestamp ?? timeLimit) < timeLimit;
+    return !!taskData && !tooOld;
+  }
 }
 
 export type HasStore = (AnyStructure | Creep) & { store: Store<ResourceConstant, false> };

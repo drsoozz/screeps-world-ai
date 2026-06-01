@@ -1,4 +1,4 @@
-import { DEFAULT_REPAIR_BOUNDS, LIFE_RENEW_BOUNDS } from "consts";
+import { DEFAULT_REPAIR_BOUNDS, LIFE_RENEW_BOUNDS, TASK_TARGET_AGE_LIMIT } from "consts";
 import { TaskType } from "./taskType";
 import { TaskActions } from "./TaskActions";
 import { TaskTargetData } from "types/memory";
@@ -134,5 +134,9 @@ export class RoleBase {
 
   getAllSafeRepairTargets(threshholds: { start: number; stop: number } = DEFAULT_REPAIR_BOUNDS) {
     return this.taskActions.getAllSafeRepairTargets(threshholds);
+  }
+
+  isTaskTargetValid(task: TaskType, timeLimit: number = TASK_TARGET_AGE_LIMIT) {
+    return this.taskActions.isTaskTargetValid(task, timeLimit);
   }
 }
