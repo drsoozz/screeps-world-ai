@@ -16,6 +16,7 @@ declare global {
     };
     roomData: Partial<Record<Room["name"], RoomData>>;
     structurePlanning: structurePlanningData;
+    creepPlanning: Partial<Record<Room["name"], { counter: number }>>;
   }
 
   interface CreepMemory {

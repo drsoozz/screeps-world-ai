@@ -1,6 +1,6 @@
 import { getRoleDist } from "creeps/roleDistribution";
 import { RoleType } from "creeps/roleType";
-import { NUM_RENEWS, ROLE_PRIORITY } from "consts";
+import { CREEP_PLANNING_FAILURE_COOLDOWN, NUM_RENEWS, ROLE_PRIORITY } from "consts";
 import { ControllerLevel } from "types/ControllerLevel";
 import { RoleBody, ScreepBody } from "creeps/roleBody";
 import { isControllerLevel } from "types/ControllerLevel";
@@ -9,12 +9,22 @@ import { TaskType } from "creeps/taskType";
 import { TaskTargetData } from "types/memory";
 
 export function planNextCreep(room: Room): void {
+  let roomPlan = Memory.creepPlanning?.[room.name];
+  if (!roomPlan) {
+    roomPlan = Memory.creepPlanning[room.name] = { counter: 0 };
+  } else if (roomPlan.counter > 0) {
+    roomPlan.counter--;
+    return;
+  }
+
+  let creepSpawnedSuccessfully = false;
+
   const cLevel = room.controller?.level;
-  if (cLevel === 0 || !isControllerLevel(cLevel)) {
+  if (!isControllerLevel(cLevel) || cLevel === 0) {
+    setCounter(room, creepSpawnedSuccessfully);
     return;
   }
   const creepsNeeded = getRoleDist(room, room.controller?.level);
-
   for (const spawn of room.find(FIND_MY_SPAWNS)) {
     const numCreepsNeeded = { ...creepsNeeded };
     const numCreepRolesPresent = Object.values(Game.creeps)
@@ -39,13 +49,17 @@ export function planNextCreep(room: Room): void {
         console.log(`Attempting to spawn creep of role "${role}".`);
         let body = _planCreepBody(spawn, cLevel, role, emergency);
         if (body === undefined) {
-          return undefined;
+          // current highest priority creep cannot be spawned
+          // so stop ENTIRE function here
+          setCounter(room, creepSpawnedSuccessfully);
+          return;
         }
 
         const memory = _planCreepMemory(role, spawn, cLevel);
         const result = spawn.spawnCreep(body, name, { memory: memory });
         if (result === 0) {
           console.log(`  > ${name} was successfully spawned.`);
+          creepSpawnedSuccessfully = true;
         } else {
           console.log(`  > An error occured while attempting to spawn ${name}: ${result}`);
         }
@@ -53,6 +67,8 @@ export function planNextCreep(room: Room): void {
       }
     }
   }
+
+  setCounter(room, creepSpawnedSuccessfully);
 }
 
 function _planCreepBody(
@@ -212,4 +228,16 @@ function _getParentSource(room: Room, role?: RoleType): Id<Source> {
   });
 
   return safeSources[0];
+}
+
+function setCounter(room: Room, creepSpawnedSuccessfully: boolean): void {
+  let roomPlan = Memory.creepPlanning?.[room.name];
+  if (!roomPlan) {
+    roomPlan = Memory.creepPlanning[room.name] = { counter: 0 };
+  }
+  roomPlan.counter = creepSpawnedSuccessfully ? 0 : CREEP_PLANNING_FAILURE_COOLDOWN;
+
+  if (creepSpawnedSuccessfully) {
+    roomPlan.counter = 0;
+  }
 }

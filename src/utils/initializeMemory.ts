@@ -12,5 +12,6 @@ export function initializeMemory(): void {
     Memory.structurePlanning = {
       roads: {}
     };
+    Memory.creepPlanning = {};
   }
 }
