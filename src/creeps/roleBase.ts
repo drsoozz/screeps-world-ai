@@ -42,6 +42,7 @@ export class RoleBase {
       if ((canRenew && shouldRenew) || forcedRenew) {
         this.memory.task = TaskType.Renew;
         this.memory.forcedRenew = false;
+        this.memory.numRenews--;
       } else if (this.memory.waiting > 0) {
         this.memory.task = TaskType.Wait;
       } else if (this.memory.waiting <= 0 && this.memory.task === TaskType.Wait) {
