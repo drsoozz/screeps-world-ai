@@ -5,6 +5,8 @@ import { findSafeSources } from "utils/findSafeSources";
 import { getRoadPlanCoords } from "./structures/getRoadPlanCoords";
 import { hasStructureOrSite } from "utils/hasStructureOrConstructionSite";
 import { getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
+import { structurePlanningFactory } from "utils/structurePlanningFactories";
+import { findOptimalTowerPosition } from "utils/findOptimalTowerPosition";
 
 export function planNextStructure(room: Room): void {
   // never build on CL1 because you don't want a backlog of construction sites before extensions can be built
@@ -60,6 +62,10 @@ export function planNextStructure(room: Room): void {
         _planRoad(room);
         break;
       }
+
+      case STRUCTURE_TOWER: {
+        return _planTower(room);
+      }
       default: {
         break;
       }
@@ -78,35 +84,18 @@ function _planExtension(spawn: StructureSpawn | undefined) {
 
   while (true) {
     pos = _pos.next().value;
+
     if (!pos) {
       return;
     }
-
-    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) {
-      continue;
-    }
-
-    if (spawn.room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y).length > 0) {
-      continue;
-    }
-
     if (spawnPos.getRangeTo(pos) < 2) {
       continue;
     }
-
-    const structuresAtTile = spawn.room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
-    if (structuresAtTile.length > 0) {
-      const roads = structuresAtTile.filter(s => s.structureType === STRUCTURE_ROAD);
-      if (structuresAtTile.length != roads.length) {
-        continue;
-      } else {
-        for (const road of roads) {
-          const result = road.destroy();
-          if (result != 0) {
-            continue;
-          }
-        }
-      }
+    const validData = isValidPlacementPosition(spawn.room, pos, terrain);
+    if (validData.endEarly) {
+      return;
+    } else if (!validData.keepGoing) {
+      continue;
     }
 
     const numBlockedSquares = getNumBlockedSquares(pos, terrain, true);
@@ -155,20 +144,13 @@ function _planContainer(room: Room) {
       return;
     }
 
-    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) {
+    const validData = isValidPlacementPosition(room, pos, terrain);
+    if (validData.endEarly) {
+      return;
+    } else if (!validData.keepGoing) {
       continue;
     }
 
-    if (room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y).length > 0) {
-      continue;
-    }
-
-    const structuresAtTile = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y).filter(s => {
-      return s.structureType != STRUCTURE_ROAD && s.structureType != STRUCTURE_RAMPART;
-    });
-    if (structuresAtTile.length > 0) {
-      continue;
-    }
     break;
   }
   const result = pos.createConstructionSite(STRUCTURE_CONTAINER);
@@ -178,9 +160,12 @@ function _planContainer(room: Room) {
 }
 
 function _planRoad(room: Room) {
-  let roadPlan =
-    Memory.structurePlanning.roads?.[room.name] ??
-    (Memory.structurePlanning.roads[room.name] = { coords: [], index: 0 });
+  let structurePlanning = Memory.structurePlanning?.[room.name];
+  if (!structurePlanning) {
+    structurePlanning = Memory.structurePlanning[room.name] = structurePlanningFactory();
+  }
+
+  let roadPlan = structurePlanning.roads;
 
   if (roadPlan.coords.length === 0 || roadPlan.index >= roadPlan.coords.length) {
     roadPlan.coords = getRoadPlanCoords(room);
@@ -200,6 +185,99 @@ function _planRoad(room: Room) {
   }
 }
 
+function _planTower(room: Room) {
+  let structurePlanning = Memory.structurePlanning?.[room.name];
+  if (!structurePlanning) {
+    structurePlanning = Memory.structurePlanning[room.name] = structurePlanningFactory();
+  }
+
+  let terrain = room.getTerrain();
+
+  let towerPlan = structurePlanning.towers;
+  if (!towerPlan?.optimalPosition) {
+    towerPlan.optimalPosition = findOptimalTowerPosition(room, terrain);
+  }
+
+  const _pos = spiralPath(getRehydratedRoomPosition(towerPlan.optimalPosition));
+  let pos: RoomPosition | void;
+
+  while (true) {
+    pos = _pos.next().value;
+    if (!pos) {
+      return;
+    }
+    const validData = isValidPlacementPosition(room, pos, terrain);
+    if (validData.endEarly) {
+      return;
+    } else if (!validData.keepGoing) {
+      continue;
+    }
+    break;
+  }
+
+  const result = pos.createConstructionSite(STRUCTURE_TOWER);
+  if (result === 0) {
+    creatingStructureMessage(STRUCTURE_TOWER);
+  }
+}
+
 function creatingStructureMessage(structName: string): void {
   console.log(`Created a(n) ${structName}.`);
+}
+
+function isValidPlacementPosition(
+  room: Room,
+  pos: RoomPosition,
+  terrain?: RoomTerrain
+): { keepGoing: boolean; endEarly: boolean } {
+  terrain = !terrain ? room.getTerrain() : terrain;
+
+  if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) {
+    return { keepGoing: false, endEarly: false };
+  }
+
+  const constructioNSitesAtTile = room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y);
+  if (constructioNSitesAtTile.length > 0) {
+    const walkable = constructioNSitesAtTile.filter(
+      s => s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_RAMPART
+    );
+    if (constructioNSitesAtTile.length != walkable.length) {
+      return { keepGoing: false, endEarly: false };
+    } else {
+      let continueLoop = false;
+      for (const w of walkable) {
+        const result = w.remove();
+        if (result != 0) {
+          continueLoop = true;
+          continue;
+        }
+      }
+      if (continueLoop) {
+        return { keepGoing: false, endEarly: false };
+      }
+    }
+  }
+
+  const structuresAtTile = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
+  if (structuresAtTile.length > 0) {
+    const walkable = structuresAtTile.filter(
+      s => s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_RAMPART
+    );
+    if (structuresAtTile.length != walkable.length) {
+      return { keepGoing: false, endEarly: false };
+    } else {
+      let continueLoop = false;
+      for (const w of walkable) {
+        const result = w.destroy();
+        if (result != 0) {
+          continueLoop = true;
+          continue;
+        }
+      }
+      if (continueLoop) {
+        return { keepGoing: false, endEarly: false };
+      }
+    }
+  }
+  return { keepGoing: true, endEarly: false };
 }

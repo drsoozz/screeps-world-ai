@@ -308,31 +308,23 @@ export class TaskActions {
       energyAvailable += energyStore.store.getUsedCapacity(RESOURCE_ENERGY) ?? 0;
     }
 
-    energyMax += this.creep.store.getCapacity(RESOURCE_ENERGY);
-    energyAvailable += this.creep.store.getCapacity(RESOURCE_ENERGY);
-
     if (renewCost > energyMax) {
       console.log(`Not enough energy storage to renew this creep. ${this.creep.name} will now suicide.`);
       this.creep.suicide();
-    } else if (renewCost > energyAvailable) {
+    } else if (renewCost > energyAvailable || energyAvailable < 100) {
       // withdraw
       if (this.creep.body.some(b => b.type === CARRY)) {
-        const containers = targetRoom.find(FIND_STRUCTURES, {
-          filter: s => {
-            return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) >= renewCost;
-          }
-        });
-        if (containers.length > 0) {
+        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+          this.deposit();
+        } else if (this.isTaskTargetValid(TaskType.Withdraw) || this.getAllSafeWithdrawTargets().length > 0) {
           this.withdraw();
-          return;
-        }
-        if (this.creep.body.some(b => b.type === WORK)) {
+        } else if (this.creep.body.some(b => b.type === WORK)) {
           this.harvest();
-          return;
         }
       }
     } else {
-      if (finalTarget.renewCreep(this.creep) == ERR_NOT_IN_RANGE) {
+      const result = finalTarget.renewCreep(this.creep);
+      if (result === ERR_NOT_IN_RANGE) {
         if (this.creep.room.name != this.memory.parentRoom) {
           this.creep.moveTo(finalTarget, {
             range: 1,
@@ -345,6 +337,10 @@ export class TaskActions {
             reusePath: DEFAULT_REUSE_PATH,
             visualizePathStyle: { stroke: "#ff3b9d", opacity: DEFAULT_PATH_OPACITY }
           });
+        }
+      } else if (result === ERR_NOT_ENOUGH_ENERGY) {
+        if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+          this.deposit();
         }
       }
     }
@@ -512,6 +508,39 @@ export class TaskActions {
         2.5 /
         this.creep.body.length
     );
+  }
+
+  getAllSafeDepositTargets(room: Room = this.creep.room) {
+    let safeDepositTargets = room
+      .find(FIND_STRUCTURES, {
+        filter: s => {
+          return (
+            (s.structureType === STRUCTURE_CONTAINER ||
+              s.structureType === STRUCTURE_SPAWN ||
+              s.structureType === STRUCTURE_EXTENSION) &&
+            s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+          );
+        }
+      })
+      .filter(s => {
+        const hostilesNearby = s.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
+        return hostilesNearby.length === 0;
+      });
+    return safeDepositTargets as (StructureSpawn | StructureExtension | StructureContainer)[];
+  }
+
+  getAllSafeWithdrawTargets(room: Room = this.creep.room) {
+    let safeDepositTargets = room
+      .find(FIND_STRUCTURES, {
+        filter: s => {
+          return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+        }
+      })
+      .filter(s => {
+        const hostilesNearby = s.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
+        return hostilesNearby.length === 0;
+      });
+    return safeDepositTargets as StructureContainer[];
   }
 
   getAllSafeConstructionSites() {

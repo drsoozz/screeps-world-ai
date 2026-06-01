@@ -97,36 +97,11 @@ export class RoleBase {
   }
 
   getAllSafeDepositTargets(room: Room = this.creep.room) {
-    let safeDepositTargets = room
-      .find(FIND_STRUCTURES, {
-        filter: s => {
-          return (
-            (s.structureType === STRUCTURE_CONTAINER ||
-              s.structureType === STRUCTURE_SPAWN ||
-              s.structureType === STRUCTURE_EXTENSION) &&
-            s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-          );
-        }
-      })
-      .filter(s => {
-        const hostilesNearby = s.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
-        return hostilesNearby.length === 0;
-      });
-    return safeDepositTargets as (StructureSpawn | StructureExtension | StructureContainer)[];
+    return this.taskActions.getAllSafeDepositTargets(room);
   }
 
   getAllSafeWithdrawTargets(room: Room = this.creep.room) {
-    let safeDepositTargets = room
-      .find(FIND_STRUCTURES, {
-        filter: s => {
-          return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-        }
-      })
-      .filter(s => {
-        const hostilesNearby = s.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
-        return hostilesNearby.length === 0;
-      });
-    return safeDepositTargets as StructureContainer[];
+    return this.taskActions.getAllSafeWithdrawTargets(room);
   }
 
   getAllSafeConstructionSites() {

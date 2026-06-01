@@ -3,15 +3,13 @@ export function initializeMemory(): void {
     return;
   } else {
     Memory.initialized = true;
-    Memory.generatePixels = true;
+    Memory.generatePixels = typeof Game.cpu?.generatePixel === "function" ? true : false;
     Memory.wasteCollection = 0;
     Memory.explorationCandidates = {
       rooms: [],
       index: 0
     };
-    Memory.structurePlanning = {
-      roads: {}
-    };
+    Memory.structurePlanning = {};
     Memory.creepPlanning = {};
   }
 }

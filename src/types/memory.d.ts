@@ -15,7 +15,7 @@ declare global {
       index: number;
     };
     roomData: Partial<Record<Room["name"], RoomData>>;
-    structurePlanning: structurePlanningData;
+    structurePlanning: Partial<Record<Room["name"], structurePlanningData>>;
     creepPlanning: Partial<Record<Room["name"], { counter: number }>>;
   }
 
@@ -33,16 +33,19 @@ declare global {
 }
 
 export type structurePlanningData = {
-  roads: Partial<
-    Record<
-      Room["name"],
-      {
-        coords: DehydratedRoomPosition[];
-        index: number;
-      }
-    >
-  >;
+  roads: structurePlanningDataRoads;
+  towers: structurePlanningDataTowers;
 };
+
+export type structurePlanningDataRoads = {
+  coords: DehydratedRoomPosition[];
+  index: number;
+};
+
+export type structurePlanningDataTowers = {
+  optimalPosition?: DehydratedRoomPosition;
+};
+
 interface TaskTargetMap {
   [TaskType.Chart]: StructureController;
   [TaskType.Construct]: Structure | ConstructionSite;

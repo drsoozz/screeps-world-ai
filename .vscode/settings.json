@@ -25,5 +25,7 @@
         "typings/**": true
     },
     "js/ts.tsdk.path": "./node_modules/typescript/lib",
-    "eslint.enable": true
+    "eslint.enable": true,
+
+
 }
