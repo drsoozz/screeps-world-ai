@@ -1,5 +1,5 @@
 import { spiralPath } from "utils/spiralPath";
-import { BUILD_PRIORITY } from "./structures/BUILD_PRIORITY";
+import { BUILD_PRIORITY } from "consts";
 import { getNumBlockedSquares } from "utils/getNumBlockedSquares";
 import { findSafeSources } from "utils/findSafeSources";
 import { getRoadPlanCoords } from "./structures/getRoadPlanCoords";

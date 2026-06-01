@@ -47,3 +47,13 @@ export const HARVESTERS_PER_SOURCE: Record<ControllerLevel, number> = {
 export const ROLE_PRIORITY: RoleType[] = [...Object.values(RoleType)];
 
 export const TASK_TARGET_AGE_LIMIT = 150;
+
+export const BUILD_PRIORITY = [
+  STRUCTURE_EXTENSION,
+  STRUCTURE_SPAWN,
+  STRUCTURE_TOWER,
+  STRUCTURE_CONTAINER,
+  STRUCTURE_ROAD,
+  STRUCTURE_WALL,
+  STRUCTURE_RAMPART
+];
