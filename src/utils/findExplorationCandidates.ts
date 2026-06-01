@@ -42,7 +42,7 @@ export function findExplorationCandidates(room: Room, range: number = DEFAULT_EX
           ).incomplete;
         })
         .filter(r => {
-          const roomData = Memory.roomData[r];
+          const roomData = Memory.roomData?.[r];
           if (!roomData) {
             return true;
           } else if (roomData.controllerLevel === 0) {
