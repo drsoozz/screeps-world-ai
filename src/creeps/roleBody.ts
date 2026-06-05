@@ -77,6 +77,28 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
       setBody: [MOVE, MOVE, MOVE, MOVE, MOVE],
       fillBody: undefined
     }
+  },
+  4: {
+    [RoleType.Harvester]: {
+      setBody: [CARRY, CARRY, MOVE, MOVE, WORK],
+      fillBody: WORK
+    },
+    [RoleType.Upgrader]: {
+      setBody: [WORK, WORK, CARRY, CARRY, CARRY, MOVE, WORK],
+      fillBody: WORK
+    },
+    [RoleType.Constructor]: {
+      setBody: [CARRY, CARRY, CARRY, MOVE, WORK, WORK],
+      fillBody: WORK
+    },
+    [RoleType.Repairer]: {
+      setBody: [CARRY, CARRY, CARRY, MOVE, WORK, WORK],
+      fillBody: CARRY
+    },
+    [RoleType.Charter]: {
+      setBody: [MOVE, MOVE, MOVE, MOVE, MOVE],
+      fillBody: undefined
+    }
   }
 };
 

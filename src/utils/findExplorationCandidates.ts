@@ -1,6 +1,10 @@
 import { DEFAULT_EXPLORATION_RANGE } from "consts";
+import { EnvironmentType } from "./initializeEnvironment";
 
 export function findExplorationCandidates(room: Room, range: number = DEFAULT_EXPLORATION_RANGE): Room["name"][] {
+  if (Memory.environment === EnvironmentType.Sim) {
+    return [];
+  }
   let candidates = new Set<Room["name"]>();
   let stack = [room.name];
   let searched = new Set<Room["name"]>();
