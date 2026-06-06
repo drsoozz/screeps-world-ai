@@ -36,6 +36,10 @@ export class Constructor extends RoleBase {
           } else {
             this.memory.task = TaskType.Upgrade;
           }
+        } else if (this.isTaskTargetValid(TaskType.Withdraw) || this.getAllSafeWithdrawTargets().length > 0) {
+          this.memory.task = TaskType.Withdraw;
+        } else {
+          this.memory.task = TaskType.Harvest;
         }
         break;
       }
