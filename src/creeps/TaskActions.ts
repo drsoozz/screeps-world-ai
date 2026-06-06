@@ -188,20 +188,25 @@ export class TaskActions {
         return;
       }
       const start = Game.getObjectById(this.memory.parentSource)?.pos ?? this.creep.pos;
-      const freeSpawnsAndExtensions = Game.rooms[this.memory.parentRoom].find(FIND_MY_STRUCTURES, {
+      const freeDepositTargets = Game.rooms[this.memory.parentRoom].find(FIND_MY_STRUCTURES, {
         filter: s => {
           return (
-            (s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION) &&
+            (s.structureType === STRUCTURE_TOWER ||
+              s.structureType === STRUCTURE_SPAWN ||
+              s.structureType === STRUCTURE_EXTENSION) &&
             s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
           );
         }
-      }) as (StructureSpawn | StructureExtension)[];
+      }) as (StructureSpawn | StructureExtension | StructureTower)[];
 
-      if (freeSpawnsAndExtensions.length > 0) {
-        freeSpawnsAndExtensions.sort((a, b) => {
+      if (freeDepositTargets.length > 0) {
+        freeDepositTargets.sort((a, b) => {
+          if (a.structureType === STRUCTURE_TOWER) {
+            return start.getRangeTo(a.pos) - 10 * start.getRangeTo(b.pos);
+          }
           return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
         });
-        finalTarget = freeSpawnsAndExtensions[0];
+        finalTarget = freeDepositTargets[0];
         finalTargetData = {
           id: finalTarget.id,
           pos: getDehydratedRoomPosition(finalTarget.pos),
