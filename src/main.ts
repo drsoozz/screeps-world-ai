@@ -5,6 +5,7 @@ import { initializeMemory } from "utils/initializeMemory";
 import { planNextCreep } from "planning/planNextCreep";
 import { RoleMap } from "creeps/roleMap";
 import { planNextStructure } from "planning/planNextStructure";
+import { logCpuUsage } from "utils/logCpuUsage";
 
 declare global {}
 // Syntax for adding properties to `global` (ex "global.log")
@@ -19,13 +20,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
   // memory initialization
   initializeMemory();
-
   // waste collection for memory to minimize spent memory
   wasteCollection();
-
   // create pixels with free CPU bucket
   // can be turned off with `Memory.generatePixels`
   generatePixels();
+  let timeMisc = Game.cpu.getUsed();
   const rooms = new Set<Room>();
   for (const room of Object.values(Game.spawns).map(c => c.room)) {
     if (rooms.has(room)) {
@@ -35,14 +35,20 @@ export const loop = ErrorMapper.wrapLoop(() => {
       planNextCreep(room);
     }
   }
+  let timePlanCreeps = Game.cpu.getUsed();
 
   for (const creep of Object.values(Game.creeps)) {
+    let a = Game.cpu.getUsed();
     rooms.add(creep.room);
     const roleClass = RoleMap[creep.memory.role];
     new roleClass(creep).run();
+    console.log(`${creep.name}: ${Game.cpu.getUsed() - a}`);
   }
+  let timeRunCreeps = Game.cpu.getUsed();
 
   for (const room of rooms) {
     planNextStructure(room);
   }
+  let timePlanStructures = Game.cpu.getUsed();
+  logCpuUsage([timeMisc, timePlanCreeps, timeRunCreeps, timePlanStructures], ["M", "PC", "RC", "PS"]);
 });

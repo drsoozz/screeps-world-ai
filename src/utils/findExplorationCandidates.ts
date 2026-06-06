@@ -1,4 +1,4 @@
-import { DEFAULT_EXPLORATION_RANGE } from "consts";
+import { CHART_TIMESTAMP_LIMIT, DEFAULT_EXPLORATION_RANGE } from "consts";
 import { EnvironmentType } from "./initializeEnvironment";
 
 export function findExplorationCandidates(room: Room, range: number = DEFAULT_EXPLORATION_RANGE): Room["name"][] {
@@ -49,6 +49,8 @@ export function findExplorationCandidates(room: Room, range: number = DEFAULT_EX
           const roomData = Memory.roomData?.[r];
           if (!roomData) {
             return true;
+          } else if (Game.time - roomData.timestamp >= CHART_TIMESTAMP_LIMIT) {
+            return true;
           } else if (roomData.controllerLevel === 0) {
             return true;
           } else {
@@ -63,6 +65,5 @@ export function findExplorationCandidates(room: Room, range: number = DEFAULT_EX
     }
     stack.push(...loop_candidates);
   }
-
   return [...candidates];
 }

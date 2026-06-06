@@ -1,4 +1,5 @@
 import {
+  CHART_TIMESTAMP_LIMIT,
   DEFAULT_LONG_JOURNEY_PATH,
   DEFAULT_PATH_OPACITY,
   DEFAULT_REPAIR_BOUNDS,
@@ -35,15 +36,11 @@ export class TaskActions {
       explorationCandidates = this.memory.explorationCandidates = { rooms: [], index: 0 };
     }
     if (explorationCandidates.rooms.length === 0) {
-      explorationCandidates = {
-        rooms: findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room),
-        index: 0
-      };
+      explorationCandidates.rooms = findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room);
+      explorationCandidates.index = 0;
     } else if (explorationCandidates.index >= explorationCandidates.rooms.length) {
-      explorationCandidates = {
-        rooms: findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room),
-        index: 0
-      };
+      explorationCandidates.rooms = findExplorationCandidates(Game.rooms[this.memory.parentRoom] ?? this.creep.room);
+      explorationCandidates.index = 0;
       this.memory.waiting = 1000;
     }
 
@@ -59,7 +56,7 @@ export class TaskActions {
     const targetTimeSinceLastChart = Game.time - targetTimestamp;
     const currentTimeSinceLastChart = Game.time - currentTimestamp;
 
-    if (currentTimeSinceLastChart > 100) {
+    if (currentTimeSinceLastChart > CHART_TIMESTAMP_LIMIT / 10) {
       Memory.roomData[currentRoom.name] = {
         safeSources: findSafeSources(currentRoom).map(s => {
           return {
@@ -79,7 +76,7 @@ export class TaskActions {
       };
     }
 
-    if (targetTimeSinceLastChart < 1000) {
+    if (targetTimeSinceLastChart < CHART_TIMESTAMP_LIMIT) {
       explorationCandidates.index++;
     } else if (this.creep.room != targetRoom) {
       if (
