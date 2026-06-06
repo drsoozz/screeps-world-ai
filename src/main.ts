@@ -25,6 +25,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
   // create pixels with free CPU bucket
   // can be turned off with `Memory.generatePixels`
   generatePixels();
+
   let timeMisc = Game.cpu.getUsed();
   const rooms = new Set<Room>();
   for (const room of Object.values(Game.spawns).map(c => c.room)) {
@@ -38,11 +39,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
   let timePlanCreeps = Game.cpu.getUsed();
 
   for (const creep of Object.values(Game.creeps)) {
-    let a = Game.cpu.getUsed();
     rooms.add(creep.room);
     const roleClass = RoleMap[creep.memory.role];
     new roleClass(creep).run();
-    console.log(`${creep.name}: ${Game.cpu.getUsed() - a}`);
   }
   let timeRunCreeps = Game.cpu.getUsed();
 
@@ -50,5 +49,5 @@ export const loop = ErrorMapper.wrapLoop(() => {
     planNextStructure(room);
   }
   let timePlanStructures = Game.cpu.getUsed();
-  logCpuUsage([timeMisc, timePlanCreeps, timeRunCreeps, timePlanStructures], ["M", "PC", "RC", "PS"]);
+  logCpuUsage("", [timeMisc, timePlanCreeps, timeRunCreeps, timePlanStructures], ["M", "PC", "RC", "PS"]);
 });
