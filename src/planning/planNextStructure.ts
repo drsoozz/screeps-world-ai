@@ -1,5 +1,5 @@
 import { spiralPath } from "utils/spiralPath";
-import { BUILD_PRIORITY } from "consts";
+import { BUILD_PRIORITY_NOT_OWNER, BUILD_PRIORITY_OWNER } from "consts";
 import { getNumBlockedSquares } from "utils/getNumBlockedSquares";
 import { findSafeSources } from "utils/findSafeSources";
 import { getRoadPlanCoords } from "./structures/getRoadPlanCoords";
@@ -13,11 +13,17 @@ export function planNextStructure(room: Room): void {
   if ((room.controller?.level ?? 0) === 1) {
     return;
   }
-
+  let roomOwner = room?.controller?.owner;
+  let meOwner = Object.values(Game.spawns)[0].owner;
+  if (roomOwner !== undefined && roomOwner !== meOwner) {
+    return;
+  }
+  let amOwner = roomOwner === meOwner;
   const existingStructs = room.find(FIND_STRUCTURES);
   const existingConstructionSites = room.find(FIND_CONSTRUCTION_SITES);
 
-  for (const struct of BUILD_PRIORITY) {
+  let buildList = amOwner ? BUILD_PRIORITY_OWNER : BUILD_PRIORITY_NOT_OWNER;
+  for (const struct of buildList) {
     let numberBuilt: number;
     let numberMax: number;
     let needToBuild = false;

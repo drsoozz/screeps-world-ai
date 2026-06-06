@@ -48,7 +48,7 @@ export const ROLE_PRIORITY: RoleType[] = [...Object.values(RoleType)];
 
 export const TASK_TARGET_AGE_LIMIT = 150;
 export const CHART_TIMESTAMP_LIMIT = 1000;
-export const BUILD_PRIORITY = [
+export const BUILD_PRIORITY_OWNER = [
   STRUCTURE_EXTENSION,
   STRUCTURE_SPAWN,
   STRUCTURE_TOWER,
@@ -57,5 +57,7 @@ export const BUILD_PRIORITY = [
   STRUCTURE_WALL,
   STRUCTURE_RAMPART
 ];
+
+export const BUILD_PRIORITY_NOT_OWNER = [STRUCTURE_ROAD];
 
 export const CREEP_PLANNING_FAILURE_COOLDOWN = 5;
