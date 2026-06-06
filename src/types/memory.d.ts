@@ -79,12 +79,11 @@ export type TaskTargetData = {
   };
 };
 
-export type TowerData = Partial<
-  Record<
-    Id<StructureTower>,
-    {
-      id: Id<StructureTower>;
-      currentTarget: Id<Creep>;
-    }
-  >
->;
+export type TowerData = {
+  towers: {
+    id: Id<StructureTower>;
+    currentTarget: Id<Creep | PowerCreep> | undefined;
+    timestamp: number;
+  }[];
+  timestamp: number;
+};

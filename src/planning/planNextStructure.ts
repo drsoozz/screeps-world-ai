@@ -13,8 +13,8 @@ export function planNextStructure(room: Room): void {
   if ((room.controller?.level ?? 0) === 1) {
     return;
   }
-  let roomOwner = room?.controller?.owner;
-  let meOwner = Object.values(Game.spawns)[0].owner;
+  let roomOwner = room?.controller?.owner?.username;
+  let meOwner = Object.values(Game.spawns)[0].owner.username;
   if (roomOwner !== undefined && roomOwner !== meOwner) {
     return;
   }
@@ -48,7 +48,6 @@ export function planNextStructure(room: Room): void {
         break;
       }
     }
-
     if (!needToBuild) {
       continue;
     }

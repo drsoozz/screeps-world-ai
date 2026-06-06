@@ -7,7 +7,7 @@ export function initializeMemory(): void {
     Memory.initialized = true;
     Memory.generatePixels = typeof Game.cpu?.generatePixel === "function" ? true : false;
     Memory.wasteCollection = 0;
-    Memory.towerData = {};
+    Memory.towerData = { towers: [], timestamp: 0 };
     Memory.structurePlanning = {};
     Memory.creepPlanning = {};
     Memory.roomData = {};

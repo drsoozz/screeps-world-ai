@@ -6,6 +6,7 @@ import { planNextCreep } from "planning/planNextCreep";
 import { RoleMap } from "creeps/roleMap";
 import { planNextStructure } from "planning/planNextStructure";
 import { logCpuUsage } from "utils/logCpuUsage";
+import { runTowers } from "towers/runTowers";
 
 declare global {}
 // Syntax for adding properties to `global` (ex "global.log")
@@ -49,5 +50,13 @@ export const loop = ErrorMapper.wrapLoop(() => {
     planNextStructure(room);
   }
   let timePlanStructures = Game.cpu.getUsed();
-  logCpuUsage("", [timeMisc, timePlanCreeps, timeRunCreeps, timePlanStructures], ["M", "PC", "RC", "PS"]);
+
+  runTowers();
+  let timeRunTowers = Game.cpu.getUsed();
+
+  logCpuUsage(
+    "",
+    [timeMisc, timePlanCreeps, timeRunCreeps, timePlanStructures, timeRunTowers],
+    ["M", "PC", "RC", "PS", "RT"]
+  );
 });
