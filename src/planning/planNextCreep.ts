@@ -53,7 +53,7 @@ export function planNextCreep(room: Room): void {
           return setCounter(room, creepSpawnedSuccessfully);
         }
 
-        const memory = _planCreepMemory(role, spawn, cLevel);
+        const memory = _planCreepMemory(role, spawn, cLevel, emergency);
         const result = spawn.spawnCreep(body, name, { memory: memory });
         if (result === 0) {
           console.log(`  > ${name} was successfully spawned.`);
@@ -129,8 +129,9 @@ function _planCreepBody(
   return body;
 }
 
-function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: ControllerLevel) {
-  let numRenews = NUM_RENEWS[cLevel];
+function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: ControllerLevel, emergency: boolean) {
+  // when this is an emergency creep it should be treated as temporary and should be given fewer renews so that it can be more quickly replaced
+  let numRenews = emergency ? NUM_RENEWS[Math.floor(cLevel / 2) as ControllerLevel] : NUM_RENEWS[cLevel];
   const parentRoom = spawn.room.name; // name not Room object sorry
   const parentSourceId = _getParentSource(spawn.room, role);
   const parentSource = Game.getObjectById(parentSourceId); // i dont think this will ever be null

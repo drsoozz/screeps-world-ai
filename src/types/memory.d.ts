@@ -12,6 +12,7 @@ declare global {
     generatePixels: boolean;
     wasteCollection: number;
     roomData: Partial<Record<Room["name"], RoomData>>;
+    towerData: TowerData;
     structurePlanning: Partial<Record<Room["name"], structurePlanningData>>;
     creepPlanning: Partial<Record<Room["name"], { counter: number }>>;
     environment: EnvironmentType;
@@ -77,3 +78,13 @@ export type TaskTargetData = {
     timestamp: number;
   };
 };
+
+export type TowerData = Partial<
+  Record<
+    Id<StructureTower>,
+    {
+      id: Id<StructureTower>;
+      currentTarget: Id<Creep>;
+    }
+  >
+>;
