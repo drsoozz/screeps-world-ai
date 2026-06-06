@@ -436,7 +436,10 @@ export class TaskActions {
      */
     if (taskTargetInfo && Game.time - taskTargetInfo.timestamp < TASK_TARGET_AGE_LIMIT) {
       const taskTarget = Game.getObjectById(taskTargetInfo.id);
-      if (hasStore(taskTarget) && taskTarget.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+      if (
+        hasStore(taskTarget) &&
+        taskTarget.store.getUsedCapacity(RESOURCE_ENERGY) > (this.creep?.store?.getCapacity(RESOURCE_ENERGY) ?? 0)
+      ) {
         finalTarget = taskTarget;
       }
     }
@@ -537,7 +540,10 @@ export class TaskActions {
     let safeDepositTargets = room
       .find(FIND_STRUCTURES, {
         filter: s => {
-          return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+          return (
+            s.structureType === STRUCTURE_CONTAINER &&
+            s.store.getUsedCapacity(RESOURCE_ENERGY) > (this.creep?.store?.getCapacity(RESOURCE_ENERGY) ?? 0)
+          );
         }
       })
       .filter(s => {
