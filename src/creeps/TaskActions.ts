@@ -202,9 +202,10 @@ export class TaskActions {
       if (freeDepositTargets.length > 0) {
         freeDepositTargets.sort((a, b) => {
           if (a.structureType === STRUCTURE_TOWER) {
-            return start.getRangeTo(a.pos) - 10 * start.getRangeTo(b.pos);
+            return start.getRangeTo(a.pos) / 10 - start.getRangeTo(b.pos);
+          } else {
+            return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
           }
-          return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
         });
         finalTarget = freeDepositTargets[0];
         finalTargetData = {
