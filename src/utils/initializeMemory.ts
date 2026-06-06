@@ -9,6 +9,7 @@ export function initializeMemory(): void {
     Memory.wasteCollection = 0;
     Memory.structurePlanning = {};
     Memory.creepPlanning = {};
+    Memory.roomData = {};
     Memory.environment = initializeEnvironment();
   }
 }

@@ -44,14 +44,11 @@ export class TaskActions {
       this.memory.waiting = 1000;
     }
 
-    const targetRoom = Game.rooms[explorationCandidates.rooms[explorationCandidates.index]];
-    if (!targetRoom) {
-      return;
-    }
-    const currentRoom = Game.rooms[this.creep.room.name];
+    const targetRoomName = explorationCandidates.rooms[explorationCandidates.index];
+    const currentRoom = this.creep.room;
 
-    let targetTimestamp = Memory.roomData[targetRoom.name]?.timestamp ?? 1;
-    let currentTimestamp = Memory.roomData[currentRoom.name]?.timestamp ?? 1;
+    let targetTimestamp = Memory.roomData?.[targetRoomName]?.timestamp ?? 1;
+    let currentTimestamp = Memory.roomData?.[currentRoom.name]?.timestamp ?? 1;
 
     const targetTimeSinceLastChart = Game.time - targetTimestamp;
     const currentTimeSinceLastChart = Game.time - currentTimestamp;
@@ -78,9 +75,9 @@ export class TaskActions {
 
     if (targetTimeSinceLastChart < CHART_TIMESTAMP_LIMIT) {
       explorationCandidates.index++;
-    } else if (this.creep.room != targetRoom) {
+    } else if (this.creep.room.name != targetRoomName) {
       if (
-        this.creep.moveTo(new RoomPosition(25, 25, targetRoom.name), {
+        this.creep.moveTo(new RoomPosition(25, 25, targetRoomName), {
           range: 23,
           swampCost: 1,
           plainCost: 1,
@@ -91,6 +88,7 @@ export class TaskActions {
         explorationCandidates.index++;
       }
     } else {
+      const targetRoom = Game.rooms[targetRoomName];
       Memory.roomData[currentRoom.name] = {
         safeSources: findSafeSources(targetRoom).map(s => {
           return {

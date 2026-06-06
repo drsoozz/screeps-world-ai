@@ -21,8 +21,7 @@ export function planNextCreep(room: Room): void {
 
   const cLevel = room.controller?.level;
   if (!isControllerLevel(cLevel) || cLevel === 0) {
-    setCounter(room, creepSpawnedSuccessfully);
-    return;
+    return setCounter(room, creepSpawnedSuccessfully);
   }
   const creepsNeeded = getRoleDist(room, room.controller?.level);
   for (const spawn of room.find(FIND_MY_SPAWNS)) {
@@ -51,8 +50,7 @@ export function planNextCreep(room: Room): void {
         if (body === undefined) {
           // current highest priority creep cannot be spawned
           // so stop ENTIRE function here
-          setCounter(room, creepSpawnedSuccessfully);
-          return;
+          return setCounter(room, creepSpawnedSuccessfully);
         }
 
         const memory = _planCreepMemory(role, spawn, cLevel);
@@ -68,7 +66,7 @@ export function planNextCreep(room: Room): void {
     }
   }
 
-  setCounter(room, creepSpawnedSuccessfully);
+  return setCounter(room, creepSpawnedSuccessfully);
 }
 
 function _planCreepBody(
