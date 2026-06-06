@@ -11,6 +11,7 @@
     "push-pserver": "rollup -c --environment DEST:pserver",
     "push-season": "rollup -c --environment DEST:season",
     "push-sim": "rollup -c --environment DEST:sim",
+    "push-all": "rollup -c --environment DEST:main && rollup -c --environment DEST:pserver && rollup -c --environment DEST:season && rollup -c --environment DEST:sim",
     "test": "npm run test-unit",
     "test-unit": "mocha test/unit/**/*.ts",
     "test-integration": "echo 'See docs/in-depth/testing.md for instructions on enabling integration tests'",
