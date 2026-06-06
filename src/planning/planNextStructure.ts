@@ -177,7 +177,10 @@ function _planRoad(room: Room) {
     roadPlan.index = 0;
     console.log(`Road data for structure planning was generated for ${room.name}.`);
   }
-  
+  if (roadPlan.coords.length === 0) {
+    // no roads to place. roads are not guaranteed from the previous step.
+    return;
+  }
   const pos = getRehydratedRoomPosition(roadPlan.coords[roadPlan.index]);
 
   roadPlan.index++;

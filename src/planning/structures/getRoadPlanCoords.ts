@@ -6,7 +6,7 @@ export function getRoadPlanCoords(room: Room): DehydratedRoomPosition[] {
   const coords: DehydratedRoomPosition[] = [];
   const terrain = room.getTerrain();
 
-  const _controller = !!room.controller ? [room.controller] : [];
+  const _controller = !!room?.controller ? [room.controller] : [];
   const _sources = findSafeSources(room);
   const _spawns = room.find(FIND_MY_SPAWNS);
   const importantStructures = [..._controller, ..._sources, ..._spawns];
