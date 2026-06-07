@@ -249,18 +249,18 @@ function isValidPlacementPosition(
     const walkable = constructioNSitesAtTile.filter(
       s => s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_RAMPART
     );
-    if (constructioNSitesAtTile.length != walkable.length) {
+    if (constructioNSitesAtTile.length !== walkable.length) {
       return { keepGoing: false, endEarly: false };
     } else {
-      let continueLoop = false;
+      let continueLoop = true;
       for (const w of walkable) {
         const result = w.remove();
-        if (result != 0) {
-          continueLoop = true;
+        if (result !== 0) {
+          continueLoop = false;
           continue;
         }
       }
-      if (continueLoop) {
+      if (!continueLoop) {
         return { keepGoing: false, endEarly: false };
       }
     }
@@ -271,18 +271,18 @@ function isValidPlacementPosition(
     const walkable = structuresAtTile.filter(
       s => s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_RAMPART
     );
-    if (structuresAtTile.length != walkable.length) {
+    if (structuresAtTile.length !== walkable.length) {
       return { keepGoing: false, endEarly: false };
     } else {
-      let continueLoop = false;
+      let continueLoop = true;
       for (const w of walkable) {
         const result = w.destroy();
-        if (result != 0) {
-          continueLoop = true;
+        if (result !== 0) {
+          continueLoop = false;
           continue;
         }
       }
-      if (continueLoop) {
+      if (!continueLoop) {
         return { keepGoing: false, endEarly: false };
       }
     }
