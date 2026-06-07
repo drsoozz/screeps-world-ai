@@ -1,7 +1,7 @@
 import { initializeEnvironment } from "./initializeEnvironment";
 
 export function initializeMemory(): void {
-  if (!!Memory.initialized) {
+  if (Memory.initialized) {
     return;
   } else {
     Memory.initialized = true;

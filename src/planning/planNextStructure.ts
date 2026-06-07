@@ -13,8 +13,10 @@ export function planNextStructure(room: Room): void {
   if ((room.controller?.level ?? 0) === 1) {
     return;
   }
+  console.log("wow!");
   let roomOwner = room?.controller?.owner?.username;
   let meOwner = Object.values(Game.spawns)[0].owner.username;
+  console.log(roomOwner, meOwner);
   if (roomOwner !== undefined && roomOwner !== meOwner) {
     return;
   }

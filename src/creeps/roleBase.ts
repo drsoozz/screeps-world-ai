@@ -17,12 +17,35 @@ export class RoleBase {
   }
 
   run(): void {
+    this._breakOscillationLoop();
     if (this.memory.task !== TaskType.Renew && this.memory.task !== TaskType.Wait) {
       this._findTask();
     }
     this._findGeneralTask();
     this._doTask();
     this._doGeneralTask();
+  }
+
+  _breakOscillationLoop() {
+    if (!this.creep.memory.oscillationBreak) {
+      this.creep.memory.oscillationBreak = { lastRoom: this.creep.room.name, stuckTicks: 0 };
+    }
+
+    if (this.creep.memory.oscillationBreak.lastRoom !== this.creep.room.name) {
+      this.creep.memory.oscillationBreak.stuckTicks = (this.creep.memory.oscillationBreak.stuckTicks || 0) + 1;
+    } else {
+      this.creep.memory.oscillationBreak.stuckTicks = 0;
+    }
+
+    this.creep.memory.oscillationBreak.lastRoom = this.creep.room.name;
+
+    if (this.creep.memory.oscillationBreak.stuckTicks > 3) {
+      const roomCenter = new RoomPosition(25, 25, this.creep.room.name);
+
+      // Take a single step toward the center to pull away from the border
+      this.creep.moveTo(roomCenter, { range: 0 });
+      return;
+    }
   }
 
   _findTask(): void {

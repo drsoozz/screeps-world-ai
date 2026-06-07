@@ -20,12 +20,17 @@ export const loop = ErrorMapper.wrapLoop(() => {
   // console.log(`Current game tick is ${Game.time}`);
 
   // memory initialization
+  let a = Game.cpu.getUsed();
   initializeMemory();
+  let b = Game.cpu.getUsed();
   // waste collection for memory to minimize spent memory
   wasteCollection();
+  let c = Game.cpu.getUsed();
   // create pixels with free CPU bucket
   // can be turned off with `Memory.generatePixels`
   generatePixels();
+  let d = Game.cpu.getUsed();
+  console.log(a, b - a, c - b, d - c);
 
   let timeMisc = Game.cpu.getUsed();
   const rooms = new Set<Room>();

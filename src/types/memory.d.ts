@@ -21,6 +21,10 @@ declare global {
   interface CreepMemory {
     role: RoleType;
     task: TaskType | undefined;
+    oscillationBreak: {
+      lastRoom: Room["name"],
+      stuckTicks: number
+    }
     parentRoom: Room["name"];
     parentSource: Id<Source>;
     controllerLevelAtBirth: ControllerLevel;
