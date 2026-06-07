@@ -554,9 +554,11 @@ export class TaskActions {
   }
 
   getAllSafeConstructionSites() {
-    // always construct in current room, not home room
-    // this is intended behavior AS OF THIS PUSH
-    const csites = this.creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+    let csites = this.creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+    if (csites.length === 0) {
+      // finds ALL CONSTRUCTION SITES globally if none exist in the current room
+      csites = Object.values(Game.constructionSites);
+    }
     const safeCSites = csites.filter(csite => {
       const hostilesNearby = csite.pos.findInRange(FIND_HOSTILE_CREEPS, 5);
       return hostilesNearby.length === 0;
