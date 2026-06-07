@@ -48,6 +48,7 @@ export function planNextStructure(room: Room): void {
         break;
       }
     }
+
     if (!needToBuild) {
       continue;
     }
@@ -96,17 +97,17 @@ function _planExtension(spawn: StructureSpawn | undefined) {
     if (spawnPos.getRangeTo(pos) < 2) {
       continue;
     }
-    const validData = isValidPlacementPosition(spawn.room, pos, terrain);
-    if (validData.endEarly) {
-      return;
-    } else if (!validData.keepGoing) {
-      continue;
-    }
 
     const numBlockedSquares = getNumBlockedSquares(pos, terrain, true);
     if (numBlockedSquares == undefined || numBlockedSquares > 0) {
       continue;
     } else {
+      const validData = isValidPlacementPosition(spawn.room, pos, terrain);
+      if (validData.endEarly) {
+        return;
+      } else if (!validData.keepGoing) {
+        continue;
+      }
       break;
     }
   }
@@ -214,13 +215,18 @@ function _planTower(room: Room) {
     if (!pos) {
       return;
     }
-    const validData = isValidPlacementPosition(room, pos, terrain);
-    if (validData.endEarly) {
-      return;
-    } else if (!validData.keepGoing) {
+    const numBlockedSquares = getNumBlockedSquares(pos, terrain, true);
+    if (numBlockedSquares == undefined || numBlockedSquares > 0) {
       continue;
+    } else {
+      const validData = isValidPlacementPosition(room, pos, terrain);
+      if (validData.endEarly) {
+        return;
+      } else if (!validData.keepGoing) {
+        continue;
+      }
+      break;
     }
-    break;
   }
 
   const result = pos.createConstructionSite(STRUCTURE_TOWER);
@@ -233,6 +239,10 @@ function creatingStructureMessage(structName: string): void {
   console.log(`Created a(n) ${structName}.`);
 }
 
+/**
+ *
+ * This should be the last criteria as this will destroy construction sites and roads preemptively
+ */
 function isValidPlacementPosition(
   room: Room,
   pos: RoomPosition,
