@@ -15,10 +15,12 @@ export function planNextStructure(room: Room): void {
   }
   let roomOwner = room?.controller?.owner?.username;
   let meOwner = Object.values(Game.spawns)[0].owner.username;
-  if (roomOwner !== undefined && roomOwner !== meOwner) {
+  let roomReserver = room?.controller?.reservation?.username;
+  if ((roomOwner !== undefined && roomOwner !== meOwner) || (roomReserver !== undefined && roomReserver !== meOwner)) {
     return;
   }
   let amOwner = roomOwner === meOwner;
+
   const existingStructs = room.find(FIND_STRUCTURES);
   const existingConstructionSites = room.find(FIND_CONSTRUCTION_SITES);
 
