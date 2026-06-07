@@ -1,21 +1,25 @@
 import { ROOM_SIZE } from "consts";
-import { DehydratedRoomPosition, getDehydratedRoomPosition } from "types/DehydratedRoomPosition";
+import {
+  DehydratedRoomPosition,
+  getDehydratedRoomPosition,
+  getRehydratedRoomPosition
+} from "types/DehydratedRoomPosition";
 import { findSafeSources } from "utils/findSafeSources";
 
 export function getRoadPlanCoords(room: Room): DehydratedRoomPosition[] {
   const coords: DehydratedRoomPosition[] = [];
   const terrain = room.getTerrain();
 
-  const _controller = !!room?.controller ? [room.controller] : [];
-  const _sources = findSafeSources(room);
-  const _spawns = room.find(FIND_MY_SPAWNS);
+  const _controller = (!!room?.controller ? [room.controller] : []).map(s => s.pos);
+  const _sources = findSafeSources(room).map(s => s.pos);
+  const _spawns = room.find(FIND_MY_SPAWNS).map(s => s.pos);
   const importantStructures = [..._controller, ..._sources, ..._spawns];
 
   for (let i = 0; i < importantStructures.length; i++) {
     for (let j = i + 1; j < importantStructures.length; j++) {
       const path = PathFinder.search(
-        importantStructures[i].pos,
-        { pos: importantStructures[j].pos, range: 1 },
+        importantStructures[i],
+        { pos: importantStructures[j], range: 1 },
         {
           plainCost: 1,
           swampCost: 1
@@ -29,11 +33,13 @@ export function getRoadPlanCoords(room: Room): DehydratedRoomPosition[] {
 
   pushNearbyPositions(importantStructures, 2, terrain, coords);
 
-  const containersAndExtensions = room.find(FIND_STRUCTURES, {
-    filter: structure => {
-      return structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_EXTENSION;
-    }
-  });
+  const containersAndExtensions = room
+    .find(FIND_STRUCTURES, {
+      filter: structure => {
+        return structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_EXTENSION;
+      }
+    })
+    .map(s => s.pos);
   // 1 range AOE around containers and extensions
   pushNearbyPositions(containersAndExtensions, 1, terrain, coords);
 
@@ -41,7 +47,7 @@ export function getRoadPlanCoords(room: Room): DehydratedRoomPosition[] {
 }
 
 function pushNearbyPositions(
-  objects: RoomObject[],
+  objects: RoomPosition[],
   range: number,
   terrain: RoomTerrain,
   coords: DehydratedRoomPosition[]
@@ -54,8 +60,8 @@ function pushNearbyPositions(
           continue;
         }
 
-        const x = obj.pos.x + dx;
-        const y = obj.pos.y + dy;
+        const x = obj.x + dx;
+        const y = obj.y + dy;
 
         // bounds check
         if (x < 0 || x >= ROOM_SIZE || y < 0 || y >= ROOM_SIZE) {
@@ -67,7 +73,7 @@ function pushNearbyPositions(
           continue;
         }
 
-        coords.push({ x: x, y: y, roomName: obj.pos.roomName });
+        coords.push({ x: x, y: y, roomName: obj.roomName });
       }
     }
   }

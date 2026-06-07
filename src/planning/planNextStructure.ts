@@ -1,12 +1,13 @@
 import { spiralPath } from "utils/spiralPath";
-import { BUILD_PRIORITY_NOT_OWNER, BUILD_PRIORITY_OWNER } from "consts";
+import { BUILD_PRIORITY_NOT_OWNER, BUILD_PRIORITY_OWNER, EXPLOITATION_CSITE_MAX, ROAD_CSITE_MAX } from "consts";
 import { getNumBlockedSquares } from "utils/getNumBlockedSquares";
 import { findSafeSources } from "utils/findSafeSources";
 import { getRoadPlanCoords } from "./structures/getRoadPlanCoords";
 import { hasStructureOrSite } from "utils/hasStructureOrConstructionSite";
 import { getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
-import { structurePlanningFactory } from "utils/structurePlanningFactories";
+import { structurePlanningFactory, structurePlanningFactoryRoads } from "utils/structurePlanningFactories";
 import { findOptimalTowerPosition } from "utils/findOptimalTowerPosition";
+import { getExploitationPlanCoords } from "./structures/getExploitationPlanCoords";
 
 export function planNextStructure(room: Room): void {
   // never build on CL1 because you don't want a backlog of construction sites before extensions can be built
@@ -67,7 +68,8 @@ export function planNextStructure(room: Room): void {
         return _planContainer(room);
       }
       case STRUCTURE_ROAD: {
-        _planRoad(room);
+        _planRoad(room, amOwner);
+        _planExploitationRoads(room, amOwner);
         break;
       }
 
@@ -167,7 +169,13 @@ function _planContainer(room: Room) {
   }
 }
 
-function _planRoad(room: Room) {
+/**
+ * Only runs if the number of construction sites currently deployed is less than `ROAD_CSITE_MAX`
+ */
+function _planRoad(room: Room, amOwner: boolean) {
+  if (!amOwner || Object.keys(Game.constructionSites).length > ROAD_CSITE_MAX) {
+    return;
+  }
   let structurePlanning = Memory.structurePlanning?.[room.name];
   if (!structurePlanning) {
     structurePlanning = Memory.structurePlanning[room.name] = structurePlanningFactory();
@@ -182,6 +190,38 @@ function _planRoad(room: Room) {
   }
   if (roadPlan.coords.length === 0) {
     // no roads to place. roads are not guaranteed from the previous step.
+    return;
+  }
+  const pos = getRehydratedRoomPosition(roadPlan.coords[roadPlan.index]);
+
+  roadPlan.index++;
+
+  if (!hasStructureOrSite(pos)) {
+    const result = pos.createConstructionSite(STRUCTURE_ROAD);
+    if (result === 0) {
+      creatingStructureMessage(STRUCTURE_ROAD);
+    }
+  }
+}
+
+/**
+ * Only runs if the number of construction sites currently deployed is less than `EXPLOITATION_CSITE_MAX`
+ */
+function _planExploitationRoads(room: Room, amOwner: boolean) {
+  if (amOwner || Object.keys(Game.constructionSites).length > EXPLOITATION_CSITE_MAX) {
+    return;
+  }
+  let roadPlan = Memory.exploitationPlanning?.[room.name];
+  if (!roadPlan) {
+    roadPlan = Memory.exploitationPlanning[room.name] = structurePlanningFactoryRoads();
+  }
+
+  if (roadPlan.coords.length === 0 || roadPlan.index >= roadPlan.coords.length) {
+    roadPlan.coords = getExploitationPlanCoords(room);
+    roadPlan.index = 0;
+    console.log(`Exploitation road data for structure planning was generated for ${room.name}.`);
+  }
+  if (roadPlan.coords.length === 0) {
     return;
   }
   const pos = getRehydratedRoomPosition(roadPlan.coords[roadPlan.index]);

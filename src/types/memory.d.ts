@@ -14,6 +14,7 @@ declare global {
     roomData: Partial<Record<Room["name"], RoomData>>;
     towerData: TowerData;
     structurePlanning: Partial<Record<Room["name"], structurePlanningData>>;
+    exploitationPlanning: Partial<Record<Room["name"], structurePlanningDataRoads>>;
     creepPlanning: Partial<Record<Room["name"], { counter: number }>>;
     environment: EnvironmentType;
   }
