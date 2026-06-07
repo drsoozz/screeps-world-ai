@@ -4,7 +4,6 @@ import {
   DEFAULT_PATH_OPACITY,
   DEFAULT_REPAIR_BOUNDS,
   DEFAULT_REUSE_PATH,
-  LIFE_RENEW_BOUNDS,
   TASK_TARGET_AGE_LIMIT
 } from "consts";
 import { TaskType } from "./taskType";
@@ -14,6 +13,7 @@ import { ControllerLevel, isControllerLevel } from "types/ControllerLevel";
 import { findExplorationCandidates } from "utils/findExplorationCandidates";
 import { getDehydratedRoomPosition, getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
 import { TaskTargetData } from "types/memory";
+import { getConstructPrioritySortWeight, getDepositPrioritySortWeight } from "utils/getSortWeights";
 
 export class TaskActions {
   creep: Creep;
@@ -132,7 +132,12 @@ export class TaskActions {
     }
 
     if (!finalTarget) {
-      let safeCSites = this.getAllSafeConstructionSites();
+      let safeCSites = this.getAllSafeConstructionSites().sort((a, b) => {
+        return (
+          this.creep.pos.getRangeTo(a.pos) * getConstructPrioritySortWeight(a) -
+          this.creep.pos.getRangeTo(b.pos) * getConstructPrioritySortWeight(b)
+        );
+      });
       if (safeCSites.length > 0) {
         this.memory.taskTargets[TaskType.Construct] = {
           id: safeCSites[0].id,
@@ -201,12 +206,12 @@ export class TaskActions {
 
       if (freeDepositTargets.length > 0) {
         freeDepositTargets.sort((a, b) => {
-          if (a.structureType === STRUCTURE_TOWER) {
-            return start.getRangeTo(a.pos) / 10 - start.getRangeTo(b.pos);
-          } else {
-            return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
-          }
+          return (
+            start.getRangeTo(a.pos) * getDepositPrioritySortWeight(a) -
+            start.getRangeTo(b.pos) * getDepositPrioritySortWeight(b)
+          );
         });
+
         finalTarget = freeDepositTargets[0];
         finalTargetData = {
           id: finalTarget.id,
@@ -221,6 +226,7 @@ export class TaskActions {
         }) as StructureContainer[];
         if (freeContainers.length > 0) {
           freeContainers.sort((a, b) => {
+            // dont need to weight as it's JUST containers
             return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
           });
           finalTarget = freeContainers[0];

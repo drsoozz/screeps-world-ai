@@ -45,7 +45,6 @@ export const HARVESTERS_PER_SOURCE: Record<ControllerLevel, number> = {
 };
 
 export const ROLE_PRIORITY: RoleType[] = [...Object.values(RoleType)];
-
 export const TASK_TARGET_AGE_LIMIT = 150;
 export const CHART_TIMESTAMP_LIMIT = 10000;
 export const BUILD_PRIORITY_OWNER = [
@@ -59,6 +58,22 @@ export const BUILD_PRIORITY_OWNER = [
 ];
 
 export const BUILD_PRIORITY_NOT_OWNER = [STRUCTURE_ROAD];
+
+export const SORT_BUILD_PRIORITY = {
+  STRUCTURE_EXTENSION: 0,
+  STRUCTURE_SPAWN: 1,
+  STRUCTURE_TOWER: 2,
+  STRUCTURE_CONTAINER: 3,
+  STRUCTURE_ROAD: 4,
+  STRUCTURE_WALL: 5,
+  STRUCTURE_RAMPART: 6
+};
+export const SORT_DEPOSIT_PRIORITY = {
+  [STRUCTURE_TOWER]: 0,
+  [STRUCTURE_EXTENSION]: 1,
+  [STRUCTURE_SPAWN]: 2,
+  [STRUCTURE_CONTAINER]: 3
+};
 
 export const CREEP_PLANNING_FAILURE_COOLDOWN = 5;
 
