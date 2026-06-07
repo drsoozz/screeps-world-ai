@@ -186,6 +186,7 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
   const creepMemory: CreepMemory = {
     role: role,
     task: undefined,
+    oscillationBreak: { lastRoom: spawn.room.name, stuckTicks: 0 },
     parentRoom: spawn.room.name,
     parentSource: parentSourceId,
     controllerLevelAtBirth: cLevel,
