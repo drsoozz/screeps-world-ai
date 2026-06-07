@@ -119,13 +119,6 @@ export class TaskActions {
 
     if (!finalTargetData?.pos.x || !finalTargetData?.pos.y || !finalTargetData?.pos.roomName) {
       delete this.memory.taskTargets[TaskType.Construct];
-    } else if (this.creep.room.name != finalTargetData.pos.roomName) {
-      this.creep.moveTo(getRehydratedRoomPosition(finalTargetData.pos), {
-        range: 3,
-        reusePath: DEFAULT_LONG_JOURNEY_PATH,
-        visualizePathStyle: { stroke: "#FE5000", opacity: DEFAULT_PATH_OPACITY }
-      });
-      return;
     } else if (finalTargetData) {
       const cSite = Game.getObjectById(finalTargetData.id) ?? undefined;
       finalTarget = cSite instanceof ConstructionSite ? cSite : undefined;
@@ -156,7 +149,7 @@ export class TaskActions {
       if (this.creep.build(finalTarget) == ERR_NOT_IN_RANGE) {
         this.creep.moveTo(finalTarget, {
           range: 3,
-          reusePath: DEFAULT_REUSE_PATH,
+          reusePath: this.creep.room.name != finalTarget.pos.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
           visualizePathStyle: { stroke: "#FE5000", opacity: DEFAULT_PATH_OPACITY }
         });
       }
@@ -248,19 +241,11 @@ export class TaskActions {
     }
 
     if (this.creep.transfer(finalTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-      if (this.creep.room.name != this.memory.parentRoom) {
-        this.creep.moveTo(finalTarget, {
-          range: 1,
-          reusePath: DEFAULT_LONG_JOURNEY_PATH,
-          visualizePathStyle: { stroke: "#1fff3d", opacity: DEFAULT_PATH_OPACITY }
-        });
-      } else {
-        this.creep.moveTo(finalTarget, {
-          range: 1,
-          reusePath: DEFAULT_REUSE_PATH,
-          visualizePathStyle: { stroke: "#1fff3d", opacity: DEFAULT_PATH_OPACITY }
-        });
-      }
+      this.creep.moveTo(finalTarget, {
+        range: 1,
+        reusePath: this.creep.room.name !== this.memory.parentRoom ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
+        visualizePathStyle: { stroke: "#1fff3d", opacity: DEFAULT_PATH_OPACITY }
+      });
     }
   }
 
@@ -272,20 +257,12 @@ export class TaskActions {
     const finalTarget = Game.getObjectById(finalTargetData?.id ?? this.memory.parentSource);
     const finalTargetPos = finalTarget?.pos ?? getRehydratedRoomPosition(finalTargetData.pos);
 
-    if (this.creep.room.name != finalTargetPos.roomName) {
+    if (finalTarget == null || this.creep.harvest(finalTarget) === ERR_NOT_IN_RANGE) {
       this.creep.moveTo(finalTargetPos, {
         range: 1,
-        reusePath: DEFAULT_LONG_JOURNEY_PATH,
+        reusePath: this.creep.room.name !== finalTargetPos.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
         visualizePathStyle: { stroke: "#ffaa00", opacity: DEFAULT_PATH_OPACITY }
       });
-    } else {
-      if (finalTarget == null || this.creep.harvest(finalTarget) === ERR_NOT_IN_RANGE) {
-        this.creep.moveTo(finalTarget ?? finalTargetPos, {
-          range: 1,
-          reusePath: DEFAULT_REUSE_PATH,
-          visualizePathStyle: { stroke: "#ffaa00", opacity: DEFAULT_PATH_OPACITY }
-        });
-      }
     }
   }
 
@@ -335,19 +312,11 @@ export class TaskActions {
     } else {
       const result = finalTarget.renewCreep(this.creep);
       if (result === ERR_NOT_IN_RANGE) {
-        if (this.creep.room.name != this.memory.parentRoom) {
-          this.creep.moveTo(finalTarget, {
-            range: 1,
-            reusePath: DEFAULT_LONG_JOURNEY_PATH,
-            visualizePathStyle: { stroke: "#ff3b9d", opacity: DEFAULT_PATH_OPACITY }
-          });
-        } else {
-          this.creep.moveTo(finalTarget, {
-            range: 1,
-            reusePath: DEFAULT_REUSE_PATH,
-            visualizePathStyle: { stroke: "#ff3b9d", opacity: DEFAULT_PATH_OPACITY }
-          });
-        }
+        this.creep.moveTo(finalTarget, {
+          range: 1,
+          reusePath: this.creep.room.name !== this.memory.parentRoom ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
+          visualizePathStyle: { stroke: "#ff3b9d", opacity: DEFAULT_PATH_OPACITY }
+        });
       } else if (result === ERR_NOT_ENOUGH_ENERGY) {
         if (this.creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
           this.deposit();
@@ -362,12 +331,6 @@ export class TaskActions {
 
     if (!finalTargetData?.pos.x || !finalTargetData?.pos.y || !finalTargetData?.pos.roomName) {
       delete this.memory.taskTargets[TaskType.Repair];
-    } else if (this.creep.room.name != finalTargetData.pos.roomName) {
-      this.creep.moveTo(getRehydratedRoomPosition(finalTargetData.pos), {
-        range: 3,
-        reusePath: DEFAULT_LONG_JOURNEY_PATH,
-        visualizePathStyle: { stroke: "#FE5000", opacity: DEFAULT_PATH_OPACITY }
-      });
     } else if (finalTargetData) {
       const _finalTarget = Game.getObjectById(finalTargetData.id) ?? undefined;
       if (!_finalTarget || _finalTarget.hits / _finalTarget.hitsMax > DEFAULT_REPAIR_BOUNDS.stop) {
@@ -396,7 +359,7 @@ export class TaskActions {
       if (this.creep.repair(finalTarget) == ERR_NOT_IN_RANGE) {
         this.creep.moveTo(finalTarget, {
           range: 3,
-          reusePath: DEFAULT_REUSE_PATH,
+          reusePath: this.creep.room.name !== finalTarget.pos.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
           visualizePathStyle: { stroke: "#00B300", opacity: DEFAULT_PATH_OPACITY }
         });
       }
@@ -412,20 +375,12 @@ export class TaskActions {
     const finalTargetPos =
       finalTarget?.pos ?? new RoomPosition(finalTargetData.pos.x, finalTargetData.pos.y, finalTargetData.pos.roomName);
 
-    if (this.creep.room.name != finalTargetPos.roomName) {
+    if (finalTarget == null || this.creep.upgradeController(finalTarget) === ERR_NOT_IN_RANGE) {
       this.creep.moveTo(finalTargetPos, {
         range: 3,
-        reusePath: DEFAULT_LONG_JOURNEY_PATH,
+        reusePath: this.creep.room.name !== finalTargetPos.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
         visualizePathStyle: { stroke: "#ffffff", opacity: DEFAULT_PATH_OPACITY }
       });
-    } else {
-      if (finalTarget == null || this.creep.upgradeController(finalTarget) === ERR_NOT_IN_RANGE) {
-        this.creep.moveTo(finalTarget ?? finalTargetPos, {
-          range: 3,
-          reusePath: DEFAULT_REUSE_PATH,
-          visualizePathStyle: { stroke: "#ffaa00", opacity: DEFAULT_PATH_OPACITY }
-        });
-      }
     }
   }
 
@@ -497,19 +452,11 @@ export class TaskActions {
     }
 
     if (this.creep.withdraw(finalTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-      if (this.creep.room.name != this.memory.parentRoom) {
-        this.creep.moveTo(finalTarget, {
-          range: 1,
-          reusePath: DEFAULT_LONG_JOURNEY_PATH,
-          visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
-        });
-      } else {
-        this.creep.moveTo(finalTarget, {
-          range: 1,
-          reusePath: DEFAULT_REUSE_PATH,
-          visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
-        });
-      }
+      this.creep.moveTo(finalTarget, {
+        range: 1,
+        reusePath: this.creep.room.name !== this.memory.parentRoom ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
+        visualizePathStyle: { stroke: "#ff1f1f", opacity: DEFAULT_PATH_OPACITY }
+      });
     }
   }
 
