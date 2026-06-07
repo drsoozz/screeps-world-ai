@@ -69,6 +69,7 @@ export class TaskActions {
           ? (currentRoom.controller?.level as ControllerLevel)
           : 0,
         owner: currentRoom.controller?.owner?.username,
+        exploiter: this.memory.parentSource,
         timestamp: Game.time
       };
     }
@@ -104,6 +105,7 @@ export class TaskActions {
           ? (targetRoom.controller?.level as ControllerLevel)
           : 0,
         owner: targetRoom.controller?.owner?.username,
+        exploiter: this.memory.parentSource,
         timestamp: Game.time
       };
       this.creep.memory.forcedRenew = true; // always renew between charting targets
