@@ -35,6 +35,13 @@ const _roleDist: Partial<Record<ControllerLevel, RoleCounts>> = {
     [RoleType.Constructor]: 2,
     [RoleType.Repairer]: 1,
     [RoleType.Charter]: 1
+  },
+  4: {
+    [RoleType.Harvester]: -1,
+    [RoleType.Upgrader]: 2,
+    [RoleType.Constructor]: 2,
+    [RoleType.Repairer]: 1,
+    [RoleType.Charter]: 1
   }
 };
 
