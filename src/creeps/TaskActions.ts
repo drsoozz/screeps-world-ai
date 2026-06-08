@@ -79,7 +79,7 @@ export class TaskActions {
         owner: currentRoom.controller?.owner?.username,
         reserver: currentRoom.controller?.reservation?.username,
         hasHostiles: hasHostiles,
-        exploiter: this.memory.parentSource,
+        exploiter: Game.rooms[this.memory.parentRoom].find(FIND_MY_SPAWNS)[0].id,
         timestamp: Game.time
       };
     }
@@ -124,7 +124,7 @@ export class TaskActions {
         owner: targetRoom.controller?.owner?.username,
         reserver: currentRoom.controller?.reservation?.username,
         hasHostiles: hasHostiles,
-        exploiter: this.memory.parentSource,
+        exploiter: Game.rooms[this.memory.parentRoom].find(FIND_MY_SPAWNS)[0].id,
         timestamp: Game.time
       };
       this.creep.memory.forcedRenew = true; // always renew between charting targets
