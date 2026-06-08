@@ -7,6 +7,7 @@ import { isControllerLevel } from "types/ControllerLevel";
 import { findSafeSources } from "utils/findSafeSources";
 import { TaskType } from "creeps/taskType";
 import { TaskTargetData } from "types/memory";
+import { getNeedyCommanders } from "creeps/military/getNeedyCommanders";
 
 export function planNextCreep(room: Room): void {
   let roomPlan = Memory.creepPlanning?.[room.name];
@@ -170,6 +171,7 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
     timestamp: Game.time
   };
 
+  let militaryMemory = undefined;
   switch (role) {
     case RoleType.Harvester: {
       break;
@@ -177,6 +179,13 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
     case RoleType.Charter: {
       numRenews *= 2;
       break;
+    }
+    case RoleType.Commander: {
+      militaryMemory = { commander: undefined, military: undefined };
+    }
+    case RoleType.Soldier: {
+      const commanders = getNeedyCommanders();
+      militaryMemory = { commander: commanders[0].id, military: commanders[0].memory.militaryMemory?.military };
     }
     default: {
       break;
@@ -193,7 +202,8 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
     numRenews: numRenews,
     forcedRenew: false,
     waiting: 0,
-    taskTargets: taskTargets
+    taskTargets: taskTargets,
+    militaryMemory: militaryMemory
   };
 
   return creepMemory;

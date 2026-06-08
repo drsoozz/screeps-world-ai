@@ -3,6 +3,7 @@ import { TaskType } from "creeps/taskType";
 import { ControllerLevel } from "./ControllerLevel";
 import { DehydratedRoomPosition } from "./DehydratedRoomPosition";
 import { EnvironmentType } from "utils/initializeEnvironment";
+import { MilitaryType } from "creeps/roles/militaryType";
 
 export {};
 
@@ -37,6 +38,10 @@ declare global {
       rooms: Room["name"][];
       index: number;
     };
+    militaryMemory?: {
+      commander: Id<Creep>;
+      military: MilitaryType;
+    };
   }
 }
 
@@ -55,10 +60,13 @@ export type structurePlanningDataTowers = {
 };
 
 interface TaskTargetMap {
+  [TaskType.Attack]: Structure | AnyCreep;
   [TaskType.Chart]: StructureController;
   [TaskType.Construct]: Structure | ConstructionSite;
   [TaskType.Deposit]: Structure;
   [TaskType.Harvest]: Source;
+  [TaskType.Raid]: Creep; // commander
+  [TaskType.Rally]: Creep; // commander
   [TaskType.Renew]: StructureSpawn;
   [TaskType.Repair]: Structure;
   [TaskType.Upgrade]: StructureController;

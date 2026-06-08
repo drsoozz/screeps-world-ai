@@ -7,7 +7,10 @@ export const TaskType = {
   Upgrade: "UPGRADE",
   Renew: "RENEW",
   Wait: "WAIT",
-  Chart: "CHART"
+  Chart: "CHART",
+  Rally: "RALLY",
+  Raid: "RAID",
+  Attack: "ATTACK"
 } as const;
 
 export type TaskType = (typeof TaskType)[keyof typeof TaskType];

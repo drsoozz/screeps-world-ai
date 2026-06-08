@@ -65,12 +65,12 @@ export function getRoleDist(room: Room, cLevel?: number): RoleCounts {
 
   const base = _roleDist[cLevel];
   if (!base) {
-    return _defaultRoleDist;
+    return getRoleDist(room, cLevel - 1); // try to get the previous one
   }
   const result: RoleCounts = { ...base };
 
   const numSafeSources = findSafeSources(room).length;
-  
+
   result[RoleType.Harvester] = numSafeSources * HARVESTERS_PER_SOURCE[cLevel];
   return result;
 }

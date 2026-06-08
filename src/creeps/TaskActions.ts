@@ -1,5 +1,6 @@
 import {
   CHART_TIMESTAMP_LIMIT,
+  DEFAULT_COMBAT_PATH,
   DEFAULT_LONG_JOURNEY_PATH,
   DEFAULT_PATH_OPACITY,
   DEFAULT_REPAIR_BOUNDS,
@@ -14,6 +15,7 @@ import { findExplorationCandidates } from "utils/findExplorationCandidates";
 import { getDehydratedRoomPosition, getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
 import { TaskTargetData } from "types/memory";
 import { getConstructPrioritySortWeight, getDepositPrioritySortWeight } from "utils/getSortWeights";
+import { object } from "lodash";
 
 export class TaskActions {
   creep: Creep;
@@ -28,6 +30,46 @@ export class TaskActions {
     this.role = this.memory.role;
     this.task = this.memory.task;
     this.taskTargets = this.memory.taskTargets;
+  }
+
+  attack(): void {
+    let finalTargetData = this.memory.taskTargets?.[TaskType.Attack];
+    let finalTarget: Structure | AnyCreep | undefined;
+    if (!finalTargetData?.pos.x || !finalTargetData?.pos.y || !finalTargetData?.pos.roomName) {
+      delete this.memory.taskTargets[TaskType.Attack];
+    } else if (finalTargetData) {
+      if (finalTargetData.pos.roomName !== this.creep.room.name) {
+        const result = this.executeLongMoveTo(finalTargetData.pos.roomName, "#9c0101");
+        if (result === ERR_NO_PATH) {
+          delete this.memory.taskTargets[TaskType.Attack];
+        }
+        return;
+      } else {
+        finalTarget = Game.getObjectById(finalTargetData.id) ?? undefined;
+        if (!finalTarget) {
+          delete this.memory.taskTargets[TaskType.Attack];
+          return;
+        }
+      }
+    }
+
+    if (!finalTarget) {
+      let attackTargets = this.getAllAttackTargets();
+      if (attackTargets.length > 0) {
+        this.memory.taskTargets[TaskType.Attack] = {
+          id: attackTargets[0].id,
+          pos: { x: attackTargets[0].pos.x, y: attackTargets[0].pos.y, roomName: attackTargets[0].pos.roomName },
+          timestamp: Game.time
+        };
+        finalTarget = attackTargets[0];
+      }
+    }
+
+    if (finalTarget) {
+      if (this.creep.attack(finalTarget) == ERR_NOT_IN_RANGE) {
+        const result = this.executeCombatMoveTo(finalTarget.pos, "#9c0101");
+      }
+    }
   }
 
   chart(): void {
@@ -202,6 +244,9 @@ export class TaskActions {
         const taskTarget = Game.getObjectById(finalTargetData.id);
         if (hasStore(taskTarget) && taskTarget.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
           finalTarget = taskTarget;
+          if (!finalTarget) {
+            delete this.memory.taskTargets[TaskType.Deposit];
+          }
         }
       }
     }
@@ -269,10 +314,14 @@ export class TaskActions {
           finalTarget = undefined;
         }
       }
+
+      // if target is still undefined
+      if (finalTarget === undefined) {
+        this.executeLongMoveTo(this.memory.parentRoom, "#000000");
+      }
     }
 
-    if (finalTarget == undefined) {
-      delete this.memory.taskTargets[TaskType.Deposit];
+    if (finalTarget === undefined) {
       return;
     }
 
@@ -292,6 +341,43 @@ export class TaskActions {
     if (finalTarget == null || this.creep.harvest(finalTarget) === ERR_NOT_IN_RANGE) {
       this.executeNormalMoveTo(finalTargetPos, "#ffaa00");
     }
+  }
+
+  raid(): void {
+    let raidTarget = this.memory.taskTargets[TaskType.Raid];
+    if (!raidTarget) {
+      this.task = TaskType.Rally;
+      return;
+    }
+    if (this.creep.room.name !== raidTarget.pos.roomName) {
+      const result = this.executeLongMoveTo(raidTarget.pos.roomName, "#9c3f01");
+      if (result === ERR_NO_PATH) {
+        this.task = TaskType.Rally;
+        return;
+      }
+    } else {
+      this.task = TaskType.Attack;
+    }
+  }
+
+  rally(): void {
+    let militaryMemory = this.memory?.militaryMemory;
+    if (!militaryMemory) {
+      return; // this creep should not be rallying
+    }
+
+    let commander = Game.getObjectById(militaryMemory.commander);
+    if (!commander) {
+      if (this.memory.role !== RoleType.Commander) {
+        // TODO
+        // commander has died
+        // function for finding new commander?
+        return;
+      } else {
+        commander = this.creep;
+      }
+    }
+    this.executeNormalMoveTo(commander.pos, "#3aa6e1");
   }
 
   renew(): void {
@@ -435,6 +521,9 @@ export class TaskActions {
         ) {
           finalTarget = taskTarget;
         }
+        if (!finalTarget) {
+          delete this.memory.taskTargets[TaskType.Withdraw];
+        }
       }
     }
 
@@ -448,7 +537,7 @@ export class TaskActions {
      * 2. nothing else as of now
      */
 
-    if (finalTarget == undefined) {
+    if (!finalTarget) {
       const targetRoom = Game.rooms[this.memory.parentRoom];
       if (!targetRoom) {
         return;
@@ -477,10 +566,13 @@ export class TaskActions {
         // it's already undefined but this is redeclared for clarity
         finalTarget = undefined;
       }
+      // if target is still undefined
+      if (finalTarget === undefined) {
+        this.executeLongMoveTo(this.memory.parentRoom, "#000000");
+      }
     }
 
     if (finalTarget == undefined) {
-      delete this.memory.taskTargets[TaskType.Withdraw];
       return;
     }
 
@@ -499,7 +591,18 @@ export class TaskActions {
     );
   }
 
+  getAllAttackTargets(room: Room = this.creep.room) {
+    let attackTargets = [
+      ...room.find(FIND_HOSTILE_POWER_CREEPS),
+      ...room.find(FIND_HOSTILE_CREEPS),
+      ...room.find(FIND_HOSTILE_STRUCTURES),
+      ...room.find(FIND_HOSTILE_SPAWNS)
+    ];
+    return attackTargets as (Structure | AnyCreep)[];
+  }
+
   getAllSafeDepositTargets(room: Room = this.creep.room) {
+    // should be updated for global stuff?
     let safeDepositTargets = room
       .find(FIND_STRUCTURES, {
         filter: s => {
@@ -572,10 +675,17 @@ export class TaskActions {
       visualizePathStyle: { stroke: stroke, opacity: DEFAULT_PATH_OPACITY }
     });
   }
-  executeNormalMoveTo(target: RoomPosition, stroke: string, range = 1) {
+  executeNormalMoveTo(target: RoomPosition, stroke: string, range: number = 1) {
     return this.creep.moveTo(target, {
       range: range,
       reusePath: this.creep.room.name !== target.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
+      visualizePathStyle: { stroke: stroke, opacity: DEFAULT_PATH_OPACITY }
+    });
+  }
+  executeCombatMoveTo(target: RoomPosition, stroke: string, range: number = 1) {
+    return this.creep.moveTo(target, {
+      range: range,
+      reusePath: this.creep.room.name !== target.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_COMBAT_PATH,
       visualizePathStyle: { stroke: stroke, opacity: DEFAULT_PATH_OPACITY }
     });
   }

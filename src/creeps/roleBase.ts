@@ -68,9 +68,9 @@ export class RoleBase {
         this.memory.numRenews--;
       } else if (this.memory.waiting > 0) {
         this.memory.task = TaskType.Wait;
-      } else if (this.memory.waiting <= 0 && this.memory.task === TaskType.Wait) {
+      } else if (this.memory.waiting === 0 && this.memory.task === TaskType.Wait) {
         this.memory.task = undefined;
-      }
+      } // if waiting is a negative value it is assumed to be a permanent wait until something forcibly changes it
     } else {
       const doneRenewing = (this.creep.ticksToLive ?? 1500) >= LIFE_RENEW_BOUNDS.stop;
       if (doneRenewing) {
@@ -86,6 +86,9 @@ export class RoleBase {
 
   _doGeneralTask(): void {
     switch (this.memory.task) {
+      case TaskType.Attack: {
+        return this.taskActions.attack();
+      }
       case TaskType.Chart: {
         return this.taskActions.chart();
       }
@@ -97,6 +100,12 @@ export class RoleBase {
       }
       case TaskType.Harvest: {
         return this.taskActions.harvest();
+      }
+      case TaskType.Rally: {
+        return this.taskActions.rally();
+      }
+      case TaskType.Raid: {
+        return this.taskActions.raid();
       }
       case TaskType.Renew: {
         return this.taskActions.renew();
@@ -117,6 +126,10 @@ export class RoleBase {
         return;
       }
     }
+  }
+
+  getAllAttackTargets(room: Room = this.creep.room) {
+    return this.taskActions.getAllAttackTargets(room);
   }
 
   getAllSafeDepositTargets(room: Room = this.creep.room) {
