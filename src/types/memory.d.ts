@@ -71,9 +71,16 @@ export type RoomData = {
     id: Id<Source>;
     pos: DehydratedRoomPosition;
   }[];
-  controllerLevel: ControllerLevel;
+  controllerLevel: ControllerLevel | undefined; // undefined if there is no controller
   owner: Owner["username"] | undefined;
   reserver: ReservationDefinition["username"] | undefined;
+  hasHostiles: {
+    creeps: boolean;
+    powerCreeps: boolean;
+    structures: boolean;
+    spawns: boolean;
+    constructionSites: boolean;
+  };
   exploiter: Id<Spawn>;
   timestamp: number;
 };

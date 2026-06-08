@@ -57,8 +57,12 @@ export function findExplorationCandidates(room: Room, range: number = DEFAULT_EX
           ) {
             searched.add(r);
             return false;
-          } else if (roomData.controllerLevel === 0) {
-            return true;
+          } else if (
+            (roomData.controllerLevel === undefined && roomData.hasHostiles.structures) ||
+            (roomData.controllerLevel !== undefined && roomData.controllerLevel > 0)
+          ) {
+            searched.add(r);
+            return false;
           } else {
             searched.add(r);
             return false;

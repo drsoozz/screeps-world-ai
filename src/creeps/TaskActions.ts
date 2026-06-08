@@ -54,6 +54,13 @@ export class TaskActions {
     const currentTimeSinceLastChart = Game.time - currentTimestamp;
 
     if (currentTimeSinceLastChart > CHART_TIMESTAMP_LIMIT / 10) {
+      const hasHostiles = {
+        creeps: currentRoom.find(FIND_HOSTILE_CREEPS).length > 0,
+        powerCreeps: currentRoom.find(FIND_HOSTILE_POWER_CREEPS).length > 0,
+        structures: currentRoom.find(FIND_HOSTILE_STRUCTURES).length > 0,
+        spawns: currentRoom.find(FIND_HOSTILE_SPAWNS).length > 0,
+        constructionSites: currentRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES).length > 0
+      };
       Memory.roomData[currentRoom.name] = {
         safeSources: findSafeSources(currentRoom).map(s => {
           return {
@@ -67,9 +74,10 @@ export class TaskActions {
         }),
         controllerLevel: isControllerLevel(currentRoom.controller?.level)
           ? (currentRoom.controller?.level as ControllerLevel)
-          : 0,
+          : undefined,
         owner: currentRoom.controller?.owner?.username,
         reserver: currentRoom.controller?.reservation?.username,
+        hasHostiles: hasHostiles,
         exploiter: this.memory.parentSource,
         timestamp: Game.time
       };
@@ -91,7 +99,15 @@ export class TaskActions {
       }
     } else {
       const targetRoom = Game.rooms[targetRoomName];
-      Memory.roomData[currentRoom.name] = {
+      const hasHostiles = {
+        creeps: targetRoom.find(FIND_HOSTILE_CREEPS).length > 0,
+        powerCreeps: targetRoom.find(FIND_HOSTILE_POWER_CREEPS).length > 0,
+        structures: targetRoom.find(FIND_HOSTILE_STRUCTURES).length > 0,
+        spawns: targetRoom.find(FIND_HOSTILE_SPAWNS).length > 0,
+        constructionSites: targetRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES).length > 0
+      };
+
+      Memory.roomData[targetRoom.name] = {
         safeSources: findSafeSources(targetRoom).map(s => {
           return {
             id: s.id,
@@ -104,9 +120,10 @@ export class TaskActions {
         }),
         controllerLevel: isControllerLevel(targetRoom.controller?.level)
           ? (targetRoom.controller?.level as ControllerLevel)
-          : 0,
+          : undefined,
         owner: targetRoom.controller?.owner?.username,
         reserver: currentRoom.controller?.reservation?.username,
+        hasHostiles: hasHostiles,
         exploiter: this.memory.parentSource,
         timestamp: Game.time
       };
