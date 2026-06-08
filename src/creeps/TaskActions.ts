@@ -160,7 +160,6 @@ export class TaskActions {
           this.creep.pos.getRangeTo(b.pos) * getConstructPrioritySortWeight(b)
         );
       });
-      console.log(safeCSites[0].id, safeCSites[0].pos.x, safeCSites[0].pos.y, safeCSites[0].pos.roomName);
 
       if (safeCSites.length > 0) {
         this.memory.taskTargets[TaskType.Construct] = {
@@ -177,7 +176,6 @@ export class TaskActions {
     }
 
     if (finalTarget) {
-      console.log("!");
       if (this.creep.build(finalTarget) == ERR_NOT_IN_RANGE) {
         const result = this.executeNormalMoveTo(finalTarget.pos, "#FE5000", 3);
       }
