@@ -6,7 +6,7 @@ import {
 } from "types/DehydratedRoomPosition";
 import { findSafeSources } from "utils/findSafeSources";
 
-export function getRoadPlanCoords(room: Room): DehydratedRoomPosition[] {
+export function getVeniceRoadCoords(room: Room): DehydratedRoomPosition[] {
   const coords: DehydratedRoomPosition[] = [];
   const terrain = room.getTerrain();
 
