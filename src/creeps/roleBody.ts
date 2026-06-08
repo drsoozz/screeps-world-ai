@@ -32,6 +32,14 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
     [RoleType.Charter]: {
       setBody: [MOVE, MOVE, MOVE, MOVE, MOVE],
       fillBody: undefined
+    },
+    [RoleType.Commander]: {
+      setBody: [MOVE, MOVE],
+      fillBody: undefined
+    },
+    [RoleType.Soldier]: {
+      setBody: [MOVE, MOVE],
+      fillBody: [ATTACK, TOUGH, TOUGH, MOVE]
     }
   },
   2: {
@@ -54,6 +62,14 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
     [RoleType.Charter]: {
       setBody: [MOVE, MOVE, MOVE, MOVE, MOVE],
       fillBody: undefined
+    },
+    [RoleType.Commander]: {
+      setBody: [MOVE, MOVE],
+      fillBody: undefined
+    },
+    [RoleType.Soldier]: {
+      setBody: [MOVE, MOVE],
+      fillBody: [ATTACK, TOUGH, TOUGH, MOVE]
     }
   },
   3: {
@@ -76,6 +92,14 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
     [RoleType.Charter]: {
       setBody: [MOVE, MOVE, MOVE, MOVE, MOVE],
       fillBody: undefined
+    },
+    [RoleType.Commander]: {
+      setBody: [MOVE, MOVE],
+      fillBody: undefined
+    },
+    [RoleType.Soldier]: {
+      setBody: [MOVE, MOVE],
+      fillBody: [ATTACK, TOUGH, TOUGH, MOVE]
     }
   },
   4: {
@@ -98,6 +122,14 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
     [RoleType.Charter]: {
       setBody: [MOVE, MOVE, MOVE, MOVE, MOVE],
       fillBody: undefined
+    },
+    [RoleType.Commander]: {
+      setBody: [MOVE, MOVE],
+      fillBody: undefined
+    },
+    [RoleType.Soldier]: {
+      setBody: [MOVE, MOVE],
+      fillBody: [ATTACK, TOUGH, TOUGH, MOVE]
     }
   }
 };

@@ -30,7 +30,7 @@ export const DEFAULT_PATH_OPACITY = 0.75;
 export const DEFAULT_EXPLORATION_RANGE = 4;
 export const DEFAULT_EXPLOITATION_RANGE = 3;
 export const DEFAULT_REUSE_PATH = 15;
-export const DEFAULT_LONG_JOURNEY_PATH = 100;
+export const DEFAULT_LONG_JOURNEY_PATH = 150;
 
 export const HARVESTERS_PER_SOURCE: Record<ControllerLevel, number> = {
   0: 1,

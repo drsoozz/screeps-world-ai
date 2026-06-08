@@ -64,8 +64,7 @@ export function findExplorationCandidates(room: Room, range: number = DEFAULT_EX
             searched.add(r);
             return false;
           } else {
-            searched.add(r);
-            return false;
+            return true;
           }
         });
       exits.forEach(r => {

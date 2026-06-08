@@ -18,7 +18,6 @@ declare const global: {
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
   // console.log(`Current game tick is ${Game.time}`);
-
   // memory initialization
   initializeMemory();
   // waste collection for memory to minimize spent memory
@@ -38,22 +37,18 @@ export const loop = ErrorMapper.wrapLoop(() => {
     }
   }
   let timePlanCreeps = Game.cpu.getUsed();
-
   for (const creep of Object.values(Game.creeps)) {
     rooms.add(creep.room);
     const roleClass = RoleMap[creep.memory.role];
     new roleClass(creep).run();
   }
   let timeRunCreeps = Game.cpu.getUsed();
-
   for (const room of rooms) {
     planNextStructure(room);
   }
   let timePlanStructures = Game.cpu.getUsed();
-
   runTowers();
   let timeRunTowers = Game.cpu.getUsed();
-
   logCpuUsage(
     "",
     [timeMisc, timePlanCreeps, timeRunCreeps, timePlanStructures, timeRunTowers],
