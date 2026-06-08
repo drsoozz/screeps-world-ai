@@ -69,6 +69,7 @@ export class TaskActions {
           ? (currentRoom.controller?.level as ControllerLevel)
           : 0,
         owner: currentRoom.controller?.owner?.username,
+        reserver: currentRoom.controller?.reservation?.username,
         exploiter: this.memory.parentSource,
         timestamp: Game.time
       };
@@ -105,6 +106,7 @@ export class TaskActions {
           ? (targetRoom.controller?.level as ControllerLevel)
           : 0,
         owner: targetRoom.controller?.owner?.username,
+        reserver: currentRoom.controller?.reservation?.username,
         exploiter: this.memory.parentSource,
         timestamp: Game.time
       };

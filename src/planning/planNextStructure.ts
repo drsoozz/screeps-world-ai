@@ -179,7 +179,9 @@ function _planRoad(
   if (roadPlan.coords.length === 0 || roadPlan.index >= roadPlan.coords.length) {
     roadPlan.coords = generator(room);
     roadPlan.index = 0;
-    console.log(generatedMessage);
+    if (roadPlan.coords.length > 0) {
+      console.log(generatedMessage);
+    }
   }
   if (roadPlan.coords.length === 0) {
     // no roads to place. roads are not guaranteed from the previous step.

@@ -73,6 +73,7 @@ export type RoomData = {
   }[];
   controllerLevel: ControllerLevel;
   owner: Owner["username"] | undefined;
+  reserver: ReservationDefinition["username"] | undefined;
   exploiter: Id<Spawn>;
   timestamp: number;
 };
