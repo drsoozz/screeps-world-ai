@@ -52,8 +52,8 @@ export function findExplorationCandidates(room: Room, range: number = DEFAULT_EX
           } else if (Game.time - roomData.timestamp >= CHART_TIMESTAMP_LIMIT) {
             return true;
           } else if (
-            (roomData.owner !== undefined && roomData.owner !== Game.spawns[0].owner.username) ||
-            (roomData.reserver !== undefined && roomData.owner !== Game.spawns[0].owner.username)
+            (roomData.owner !== undefined && roomData.owner !== Object.values(Game.spawns)[0].owner.username) ||
+            (roomData.reserver !== undefined && roomData.owner !== Object.values(Game.spawns)[0].owner.username)
           ) {
             searched.add(r);
             return false;

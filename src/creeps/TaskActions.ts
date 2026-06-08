@@ -183,7 +183,7 @@ export class TaskActions {
      * 1. spawn | structure
      * 2. container
      */
-    if (finalTarget == undefined) {
+    if (!finalTarget) {
       // check to make sure we actually have vision of the room before scanning
       const targetRoom = Game.rooms[this.memory.parentRoom];
       if (!targetRoom) {
@@ -210,7 +210,7 @@ export class TaskActions {
         });
 
         finalTarget = freeDepositTargets[0];
-        finalTargetData = {
+        finalTargetData = this.memory.taskTargets[TaskType.Deposit] = {
           id: finalTarget.id,
           pos: getDehydratedRoomPosition(finalTarget.pos),
           timestamp: Game.time
@@ -227,7 +227,7 @@ export class TaskActions {
             return start.getRangeTo(a.pos) - start.getRangeTo(b.pos);
           });
           finalTarget = freeContainers[0];
-          finalTargetData = {
+          finalTargetData = this.memory.taskTargets[TaskType.Deposit] = {
             id: finalTarget.id,
             pos: getDehydratedRoomPosition(finalTarget.pos),
             timestamp: Game.time
@@ -351,7 +351,7 @@ export class TaskActions {
           return a.hits / a.hitsMax - b.hits / b.hitsMax;
         });
         finalTarget = potentialTargets[0];
-        finalTargetData = {
+        finalTargetData = this.memory.taskTargets[TaskType.Repair] = {
           id: finalTarget.id,
           pos: getDehydratedRoomPosition(finalTarget.pos),
           timestamp: Game.time
