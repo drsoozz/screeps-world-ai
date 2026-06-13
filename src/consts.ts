@@ -30,9 +30,10 @@ export const NUM_RENEWS: Record<ControllerLevel, number> = {
 export const DEFAULT_PATH_OPACITY = 0.75;
 export const DEFAULT_EXPLORATION_RANGE = 4;
 export const DEFAULT_EXPLOITATION_RANGE = 3;
+export const DEFAULT_RAIDING_RANGE = 3;
 export const DEFAULT_COMBAT_PATH = 3;
 export const DEFAULT_REUSE_PATH = 15;
-export const DEFAULT_LONG_JOURNEY_PATH = 150;
+export const DEFAULT_LONG_JOURNEY_PATH = 25;
 
 export const HARVESTERS_PER_SOURCE: Record<ControllerLevel, number> = {
   0: 1,
@@ -47,6 +48,7 @@ export const HARVESTERS_PER_SOURCE: Record<ControllerLevel, number> = {
 };
 
 export const ROLE_PRIORITY: RoleType[] = [...Object.values(RoleType)];
+export const MILITARY_PRIORITY: MilitaryType[] = [...Object.values(MilitaryType)];
 export const TASK_TARGET_AGE_LIMIT = 250;
 export const CHART_TIMESTAMP_LIMIT = 10000;
 export const BUILD_PRIORITY_OWNER = [
@@ -78,7 +80,7 @@ export const SORT_DEPOSIT_PRIORITY = {
 };
 export const SORT_MILITARY_PRIORITY = {
   [MilitaryType.DEFENSE]: 0,
-  [MilitaryType.RAID]: 0
+  [MilitaryType.RAID]: 1
 };
 
 export const CREEP_PLANNING_FAILURE_COOLDOWN = 5;
@@ -88,3 +90,15 @@ export const TOWERDATA_TARGET_TIMESTAMP_LIMIT = 10;
 
 export const ROAD_CSITE_MAX = 90;
 export const EXPLOITATION_CSITE_MAX = 50;
+
+export const COMMANDER_TROOPS_WANTED: Record<ControllerLevel, number> = {
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 2,
+  4: 3,
+  5: 3,
+  6: 3,
+  7: 3,
+  8: 4
+};

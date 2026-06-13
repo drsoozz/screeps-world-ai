@@ -3,6 +3,7 @@ export const TaskType = {
   Deposit: "DEPOSIT",
   Withdraw: "WITHDRAW",
   Construct: "CONSTRUCT",
+  Command: "COMMAND",
   Repair: "REPAIR",
   Upgrade: "UPGRADE",
   Renew: "RENEW",

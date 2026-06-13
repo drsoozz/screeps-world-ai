@@ -39,7 +39,7 @@ declare global {
       index: number;
     };
     militaryMemory?: {
-      commander: Id<Creep>;
+      commander: Id<Creep> | undefined;
       military: MilitaryType;
     };
   }
@@ -62,6 +62,7 @@ export type structurePlanningDataTowers = {
 interface TaskTargetMap {
   [TaskType.Attack]: Structure | AnyCreep;
   [TaskType.Chart]: StructureController;
+  [TaskType.Command]: Structure | AnyCreep;
   [TaskType.Construct]: Structure | ConstructionSite;
   [TaskType.Deposit]: Structure;
   [TaskType.Harvest]: Source;

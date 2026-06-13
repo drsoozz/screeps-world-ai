@@ -1,6 +1,9 @@
 export function logCpuUsage(headerMessage: string, times: number[], names: string[]): void {
   let messageToPrint = headerMessage;
   const cpuLimit = Game.cpu.limit;
+  if (!cpuLimit) {
+    return;
+  }
   const time = (times[0] / cpuLimit) * 100;
   messageToPrint += `| ${names[0]}: ${time.toPrecision(3)}% | `;
   for (let i = 1; i < times.length; i++) {

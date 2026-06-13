@@ -5,7 +5,7 @@ export const RoleType = {
   Repairer: "REPAIRER",
   Charter: "CHARTER",
   Commander: "COMMANDER",
-  Soldier: "Soldier"
+  Soldier: "SOLDIER"
 } as const;
 
 export type RoleType = (typeof RoleType)[keyof typeof RoleType];

@@ -57,6 +57,7 @@ export function getNumBlockedSquares(
   return result;
 }
 
+// exclude structures / construction sites for structures that are walkable
 function defaultFilter(s: Structure | ConstructionSite): boolean {
   const t = s.structureType;
   return t != STRUCTURE_ROAD && t != STRUCTURE_CONTAINER && t != STRUCTURE_RAMPART;

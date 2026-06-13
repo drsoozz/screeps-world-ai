@@ -14,8 +14,15 @@ import { ControllerLevel, isControllerLevel } from "types/ControllerLevel";
 import { findExplorationCandidates } from "utils/findExplorationCandidates";
 import { getDehydratedRoomPosition, getRehydratedRoomPosition } from "types/DehydratedRoomPosition";
 import { TaskTargetData } from "types/memory";
-import { getConstructPrioritySortWeight, getDepositPrioritySortWeight } from "utils/getSortWeights";
+import {
+  getCommanderPrioritySortWeight,
+  getConstructPrioritySortWeight,
+  getDepositPrioritySortWeight
+} from "utils/getSortWeights";
 import { object } from "lodash";
+import { MilitaryType } from "./roles/MilitaryType";
+import { MilitaryTypeToTaskMap } from "./military/MilitaryTypeToTaskMap";
+import { getRaidPos } from "./military/getRaidPos";
 
 export class TaskActions {
   creep: Creep;
@@ -49,6 +56,8 @@ export class TaskActions {
         if (!finalTarget) {
           delete this.memory.taskTargets[TaskType.Attack];
           return;
+        } else {
+          finalTargetData.pos = getDehydratedRoomPosition(finalTarget?.pos);
         }
       }
     }
@@ -173,6 +182,57 @@ export class TaskActions {
       };
       this.creep.memory.forcedRenew = true; // always renew between charting targets
     }
+  }
+
+  command(): void {
+    const soldiers = this.getAllNearbySoldiers();
+    const military = this.memory.militaryMemory?.military ?? MilitaryType.DEFENSE;
+    const task = MilitaryTypeToTaskMap[military];
+    let finalTargetData;
+    switch (task) {
+      default:
+      case TaskType.Attack: {
+        const _finalTargets = this.getAllAttackTargets().sort((a, b) => {
+          return this.creep.pos.getRangeTo(a.pos) - this.creep.pos.getRangeTo(b.pos);
+        });
+        if (_finalTargets.length === 0) {
+          this.memory.waiting = 10;
+          return; // dont do anything right now
+        }
+        const finalTarget = _finalTargets[0];
+        finalTargetData = {
+          id: finalTarget.id,
+          pos: getDehydratedRoomPosition(finalTarget.pos),
+          timestamp: Game.time
+        };
+
+        for (const soldier of soldiers) {
+          soldier.memory.task = task;
+          soldier.memory.taskTargets[TaskType.Attack] = finalTargetData;
+        }
+
+        break;
+      }
+      case TaskType.Raid: {
+        const pos = getRaidPos(this.creep.room);
+        if (!pos) {
+          return;
+        }
+        finalTargetData = {
+          id: this.creep.id, // id of commander
+          pos: pos, // position of room for soldiers to travel to during Raid task
+          timestamp: Game.time
+        };
+
+        for (const soldier of soldiers) {
+          soldier.memory.task = task;
+          soldier.memory.taskTargets[TaskType.Raid] = finalTargetData;
+        }
+        break;
+      }
+    }
+    this.memory.task = undefined;
+    this.memory.waiting = 25;
   }
 
   construct(): void {
@@ -365,7 +425,11 @@ export class TaskActions {
     if (!militaryMemory) {
       return; // this creep should not be rallying
     }
-
+    if (!militaryMemory?.commander) {
+      // Commander creeps do not currently have commanders implemented. they are supposed to do nothing for rally()
+      // this is because _doTask() has them do their correct stuff.
+      return;
+    }
     let commander = Game.getObjectById(militaryMemory.commander);
     if (!commander) {
       if (this.memory.role !== RoleType.Commander) {
@@ -663,6 +727,22 @@ export class TaskActions {
     return structs;
   }
 
+  getAllNearbySoldiers() {
+    const top = this.creep.pos.y + 1;
+    const left = this.creep.pos.x - 1;
+    const bottom = this.creep.pos.y - 1;
+    const right = this.creep.pos.x + 1;
+    const numSoldiers = this.creep.room
+      .lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+      .map(c => c.creep)
+      .filter(c => {
+        const isMine = c.owner.username === this.creep.owner.username;
+        const isSoldier = c.memory.role === RoleType.Soldier;
+        return isMine && isSoldier;
+      });
+    return numSoldiers;
+  }
+
   isTaskTargetValid(task: TaskType, timeLimit: number = TASK_TARGET_AGE_LIMIT): boolean {
     const taskData = this.taskTargets?.[task];
     const tooOld = Game.time - (taskData?.timestamp ?? timeLimit) < timeLimit;
@@ -677,7 +757,7 @@ export class TaskActions {
   }
   executeNormalMoveTo(target: RoomPosition, stroke: string, range: number = 1) {
     return this.creep.moveTo(target, {
-      range: range,
+      range: this.creep.room.name !== target.roomName ? range + 3 : range,
       reusePath: this.creep.room.name !== target.roomName ? DEFAULT_LONG_JOURNEY_PATH : DEFAULT_REUSE_PATH,
       visualizePathStyle: { stroke: stroke, opacity: DEFAULT_PATH_OPACITY }
     });

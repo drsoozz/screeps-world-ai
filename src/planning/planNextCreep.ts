@@ -8,8 +8,11 @@ import { findSafeSources } from "utils/findSafeSources";
 import { TaskType } from "creeps/taskType";
 import { TaskTargetData } from "types/memory";
 import { getNeedyCommanders } from "creeps/military/getNeedyCommanders";
+import { planNextMilitary } from "./planNextMilitary";
+import { MilitaryType } from "creeps/roles/MilitaryType";
 
 export function planNextCreep(room: Room): void {
+  // only do this periodically. the counter goes up whenever a spawn fails
   let roomPlan = Memory.creepPlanning?.[room.name];
   if (!roomPlan) {
     roomPlan = Memory.creepPlanning[room.name] = { counter: 0 };
@@ -98,7 +101,7 @@ function _planCreepBody(
   let energyCost = _.sum(body, bp => BODYPART_COST[bp]);
   if (energyCost > energyMax) {
     console.log(
-      `  > Not enough energy storage to create this creep's basic body plan (${energyMax}/${energyCost}). BODY PLAN: ${body}`
+      `  > Not enough energy ge to create this creep's basic body plan (${energyMax}/${energyCost}). BODY PLAN: ${body}`
     );
     return undefined;
   }
@@ -181,11 +184,17 @@ function _planCreepMemory(role: RoleType, spawn: StructureSpawn, cLevel: Control
       break;
     }
     case RoleType.Commander: {
-      militaryMemory = { commander: undefined, military: undefined };
+      militaryMemory = { commander: undefined, military: planNextMilitary(spawn.room) };
+      numRenews = 999;
+      break;
     }
     case RoleType.Soldier: {
       const commanders = getNeedyCommanders();
-      militaryMemory = { commander: commanders[0].id, military: commanders[0].memory.militaryMemory?.military };
+      militaryMemory = {
+        commander: commanders[0].id,
+        military: commanders[0].memory.militaryMemory?.military ?? MilitaryType.DEFENSE
+      };
+      break;
     }
     default: {
       break;

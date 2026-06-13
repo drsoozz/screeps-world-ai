@@ -92,6 +92,9 @@ export class RoleBase {
       case TaskType.Chart: {
         return this.taskActions.chart();
       }
+      case TaskType.Command: {
+        return this.taskActions.command();
+      }
       case TaskType.Construct: {
         return this.taskActions.construct();
       }

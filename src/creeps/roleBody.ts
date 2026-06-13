@@ -74,19 +74,19 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
   },
   3: {
     [RoleType.Harvester]: {
-      setBody: [CARRY, CARRY, MOVE, MOVE, WORK],
+      setBody: [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, WORK],
       fillBody: WORK
     },
     [RoleType.Upgrader]: {
-      setBody: [WORK, WORK, CARRY, CARRY, CARRY, MOVE, WORK],
-      fillBody: WORK
+      setBody: [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
+      fillBody: CARRY
     },
     [RoleType.Constructor]: {
-      setBody: [CARRY, CARRY, CARRY, MOVE, WORK, WORK],
+      setBody: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, WORK, WORK],
       fillBody: CARRY
     },
     [RoleType.Repairer]: {
-      setBody: [CARRY, CARRY, CARRY, MOVE, WORK, WORK],
+      setBody: [CARRY, CARRY, CARRY, MOVE, MOVE, WORK, WORK],
       fillBody: CARRY
     },
     [RoleType.Charter]: {
@@ -104,19 +104,19 @@ export const RoleBody: Partial<Record<ControllerLevel, RoleBodies>> = {
   },
   4: {
     [RoleType.Harvester]: {
-      setBody: [CARRY, CARRY, MOVE, MOVE, WORK],
+      setBody: [CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, WORK],
       fillBody: WORK
     },
     [RoleType.Upgrader]: {
-      setBody: [WORK, WORK, CARRY, CARRY, CARRY, MOVE, WORK],
-      fillBody: WORK
+      setBody: [WORK, WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
+      fillBody: CARRY
     },
     [RoleType.Constructor]: {
-      setBody: [CARRY, CARRY, CARRY, MOVE, WORK, WORK],
+      setBody: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, WORK, WORK],
       fillBody: CARRY
     },
     [RoleType.Repairer]: {
-      setBody: [CARRY, CARRY, CARRY, MOVE, WORK, WORK],
+      setBody: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, WORK, WORK],
       fillBody: CARRY
     },
     [RoleType.Charter]: {

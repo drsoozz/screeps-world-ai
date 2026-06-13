@@ -1,6 +1,6 @@
 export const MilitaryType = {
-  RAID: "Raid",
-  DEFENSE: "Defense"
+  RAID: "RAID",
+  DEFENSE: "DEFENSE"
 } as const;
 
 export type MilitaryType = (typeof MilitaryType)[keyof typeof MilitaryType];
